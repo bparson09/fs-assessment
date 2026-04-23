@@ -8,27 +8,30 @@
         :root { --main-teal: #3eb1a5; --action-red: #c0392b; --action-orange: #e67e22; --bg-gray: #f4f7f6; --safe-green: #27ae60; }
         body { font-family: sans-serif; background-color: var(--bg-gray); margin: 0; padding: 10px; display: flex; justify-content: center; }
         .app-container { width: 100%; max-width: 450px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 2px solid var(--main-teal); overflow: hidden; }
-        .header { background: var(--main-teal); color: white; padding: 15px; text-align: center; }
-        .header h1 { margin: 0; font-size: 1rem; text-transform: uppercase; }
-        .header p { margin: 5px 0 0; font-size: 0.65rem; opacity: 0.9; }
-        .content { padding: 15px; }
-        .section-label { font-size: 0.7rem; font-weight: bold; color: var(--main-teal); text-transform: uppercase; margin: 15px 0 5px 0; display: block; }
-        .field-box { margin-bottom: 12px; }
+        .header { background: var(--main-teal); color: white; padding: 12px; text-align: center; }
+        .header h1 { margin: 0; font-size: 0.9rem; text-transform: uppercase; }
+        .header p { margin: 4px 0 0; font-size: 0.6rem; opacity: 0.9; }
+        .content { padding: 12px; }
+        .section-label { font-size: 0.7rem; font-weight: bold; color: var(--main-teal); text-transform: uppercase; margin: 10px 0 5px 0; display: block; }
+        .field-box { margin-bottom: 10px; }
         .field-label { font-size: 0.75rem; font-weight: bold; color: #4a5568; margin-bottom: 4px; display: block; }
         .input-full { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
-        .input-group { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        
+        /* RESPONSIVE GRID: Stacks on mobile, side-by-side on laptop */
+        .financial-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+        
+        .input-group { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
         select { flex-grow: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 0.9rem; min-width: 0; }
         .camera-btn { background: #f1f5f9; border: 1px solid #cbd5e0; border-radius: 8px; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; flex-shrink: 0; }
         .photo-count { position: absolute; top: -5px; right: -5px; background: var(--main-teal); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; font-weight: bold; }
-        .financial-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .status-banner { padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.8rem; margin-bottom: 10px; display: none; }
-        .btn-run { width: 100%; padding: 18px; background: var(--main-teal); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
+        .status-banner { padding: 8px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.75rem; margin-bottom: 10px; display: none; }
+        .btn-run { width: 100%; padding: 16px; background: var(--main-teal); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
         .results-area { display: none; margin-top: 15px; }
         .summary-card { background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #edf2f7; margin-bottom: 15px; }
         .summary-line { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; }
         .sync-btn { width: 100%; padding: 20px; background: var(--action-red); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; display: none; }
-        .office-view { display: none; background: #fffbeb; padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px dashed #f59e0b; }
-        .warning-text { color: #b91c1c; font-size: 0.75rem; font-weight: bold; margin-top: 10px; text-align: center; }
+        .office-view { display: none; background: #fffbeb; padding: 12px; border-radius: 10px; margin-top: 15px; border: 1px dashed #f59e0b; }
+        .warning-text { color: #b91c1c; font-size: 0.75rem; font-weight: bold; margin-top: 8px; text-align: center; }
     </style>
 </head>
 <body>
@@ -42,10 +45,16 @@
     <div class="content">
         <div id="auction-status" class="status-banner"></div>
 
-        <div class="field-box"><label class="field-label">Property Address</label><input type="text" id="address" class="input-full" placeholder="Street, City, State"></div>
+        <div class="field-box">
+            <label class="field-label">Property Address</label>
+            <input type="text" id="address" class="input-full" placeholder="Street, City, State">
+        </div>
         
         <div class="financial-grid">
-            <div class="field-box"><label class="field-label">Auction Date</label><input type="date" id="auction-date" class="input-full" onchange="updateAuctionStatus()"></div>
+            <div class="field-box">
+                <label class="field-label">Auction Date</label>
+                <input type="date" id="auction-date" class="input-full" onchange="updateAuctionStatus()">
+            </div>
             <div class="field-box">
                 <label class="field-label">Move Window</label>
                 <select id="move-window" class="input-full">
@@ -76,11 +85,11 @@
         <button style="width:100%; margin-top:10px; font-size:0.6rem; border:none; background:none; color:#94a3b8; cursor:pointer;" onclick="toggleOffice()">[ TOGGLE OFFICE VIEW ]</button>
 
         <div id="results" class="results-area">
-            <div id="deal-verdict" style="text-align:center; font-weight:bold; margin-bottom:10px; font-size: 1.2rem;"></div>
+            <div id="deal-verdict" style="text-align:center; font-weight:bold; margin-bottom:10px; font-size: 1.1rem;"></div>
             <div class="summary-card">
                 <div class="summary-line"><span>Total Debt Cleared:</span> <span id="res-debt">$0</span></div>
                 <div class="summary-line"><span>Relocation Benefit:</span> <span id="res-relo">$0</span></div>
-                <div class="summary-line" style="border-top:1px solid #ccc; padding-top:10px; font-weight:bold; color:var(--main-teal); font-size:1.1rem;">
+                <div class="summary-line" style="border-top:1px solid #ccc; padding-top:10px; font-weight:bold; color:var(--main-teal); font-size:1rem;">
                     <span>GUARANTEED SELLER TOTAL:</span> <span id="res-total">$0</span>
                 </div>
             </div>
