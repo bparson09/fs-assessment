@@ -17,9 +17,8 @@
         .field-label { font-size: 0.75rem; font-weight: bold; color: #4a5568; margin-bottom: 4px; display: block; }
         .input-full { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
         .input-group { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-        select { flex-grow: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 0.9rem; }
-        .camera-wrapper { position: relative; }
-        .camera-btn { background: #f1f5f9; border: 1px solid #cbd5e0; border-radius: 8px; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+        select { flex-grow: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 0.9rem; min-width: 0; }
+        .camera-btn { background: #f1f5f9; border: 1px solid #cbd5e0; border-radius: 8px; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; flex-shrink: 0; }
         .photo-count { position: absolute; top: -5px; right: -5px; background: var(--main-teal); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; font-weight: bold; }
         .financial-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .status-banner { padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.8rem; margin-bottom: 10px; display: none; }
@@ -43,110 +42,83 @@
     <div class="content">
         <div id="auction-status" class="status-banner"></div>
 
-        <div class="field-box">
-            <label class="field-label">Property Address</label>
-            <input type="text" id="address" class="input-full" placeholder="Street, City, State">
-        </div>
-        
-        <div class="input-group">
-            <span class="field-label" style="margin-bottom:0;">Auction Date:</span>
-            <input type="date" id="auction-date" class="input-full" style="width: auto;" onchange="updateAuctionStatus()">
-        </div>
+        <div class="field-box"><label class="field-label">Property Address</label><input type="text" id="address" class="input-full" placeholder="Street, City, State"></div>
+        <div class="input-group"><span class="field-label" style="margin-bottom:0;">Auction Date:</span><input type="date" id="auction-date" class="input-full" style="width: auto;" onchange="updateAuctionStatus()"></div>
 
         <span class="section-label">Property Condition</span>
-        <div class="input-group">
-            <select id="roof"><option value="0">Roof: Functional ($0)</option><option value="8000">Roof: Repair ($8k)</option><option value="15000">Roof: Replacement ($15k)</option></select>
-            <div class="camera-wrapper"><button class="camera-btn" onclick="takePhoto('count-roof')">📸<span id="count-roof" class="photo-count">0</span></button></div>
-        </div>
-        <div class="input-group">
-            <select id="hvac"><option value="0">HVAC: Functional ($0)</option><option value="3500">HVAC: Service ($3.5k)</option><option value="10000">HVAC: Replacement ($10k)</option></select>
-            <div class="camera-wrapper"><button class="camera-btn" onclick="takePhoto('count-hvac')">📸<span id="count-hvac" class="photo-count">0</span></button></div>
-        </div>
-        <div class="input-group">
-            <select id="kitchen"><option value="0">Kitchen: Clean ($0)</option><option value="8000">Kitchen: Cosmetic ($8k)</option><option value="25000">Kitchen: Full Remodel ($25k)</option></select>
-            <div class="camera-wrapper"><button class="camera-btn" onclick="takePhoto('count-kitchen')">📸<span id="count-kitchen" class="photo-count">0</span></button></div>
-        </div>
-        <div class="input-group">
-            <select id="trash"><option value="0">Debris: Broom Clean ($0)</option><option value="1500">Debris: Light ($1.5k)</option><option value="3000" selected>Debris: Heavy ($3k)</option></select>
-            <div class="camera-wrapper"><button class="camera-btn" onclick="takePhoto('count-trash')">📸<span id="count-trash" class="photo-count">0</span></button></div>
-        </div>
+        <div class="input-group"><select id="roof"><option value="0">Roof: Functional ($0)</option><option value="8000">Roof: Repair ($8k)</option><option value="15000">Roof: Replacement ($15k)</option></select><button class="camera-btn" onclick="triggerCam('count-roof')">📸<span id="count-roof" class="photo-count">0</span></button></div>
+        <div class="input-group"><select id="hvac"><option value="0">HVAC: Functional ($0)</option><option value="3500">HVAC: Service ($3.5k)</option><option value="10000">HVAC: Replacement ($10k)</option></select><button class="camera-btn" onclick="triggerCam('count-hvac')">📸<span id="count-hvac" class="photo-count">0</span></button></div>
+        <div class="input-group"><select id="kitchen"><option value="0">Kitchen: Clean ($0)</option><option value="8000">Kitchen: Cosmetic ($8k)</option><option value="25000">Kitchen: Full Remodel ($25k)</option></select><button class="camera-btn" onclick="triggerCam('count-kitchen')">📸<span id="count-kitchen" class="photo-count">0</span></button></div>
+        <div class="input-group"><select id="trash"><option value="0">Debris: Broom Clean ($0)</option><option value="1500">Debris: Light ($1.5k)</option><option value="3000" selected>Debris: Heavy ($3k)</option></select><button class="camera-btn" onclick="triggerCam('count-trash')">📸<span id="count-trash" class="photo-count">0</span></button></div>
 
-        <input type="file" id="cam" accept="image/*" capture="camera" style="display:none">
+        <input type="file" id="cam" accept="image/*" capture="camera" style="display:none" onchange="fileSelected()">
 
         <span class="section-label">Financials</span>
-        <div class="field-box">
-            <label class="field-label">After Repair Value (ARV)</label>
-            <input type="text" id="arv" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)">
-        </div>
-        
+        <div class="field-box"><label class="field-label">After Repair Value (ARV)</label><input type="text" id="arv" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)"></div>
         <div class="financial-grid">
-            <div class="field-box">
-                <label class="field-label">Mortgage Payoff</label>
-                <input type="text" id="mortgage" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)">
-            </div>
-            <div class="field-box">
-                <label class="field-label">Total Arrears</label>
-                <input type="text" id="arrears" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)">
-            </div>
+            <div class="field-box"><label class="field-label">Mortgage Payoff</label><input type="text" id="mortgage" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)"></div>
+            <div class="field-box"><label class="field-label">Total Arrears</label><input type="text" id="arrears" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)"></div>
         </div>
-
-        <div class="field-box">
-            <label class="field-label">Relo Benefit</label>
-            <input type="text" id="relo" class="input-full currency" value="2,000" oninput="formatCurrency(this)">
-        </div>
+        <div class="field-box"><label class="field-label">Relo Benefit</label><input type="text" id="relo" class="input-full currency" value="2,000" oninput="formatCurrency(this)"></div>
         
         <button class="btn-run" onclick="runAssessment()">Run Assessment</button>
         <button style="width:100%; margin-top:10px; font-size:0.6rem; border:none; background:none; color:#94a3b8; cursor:pointer;" onclick="toggleOffice()">[ TOGGLE OFFICE VIEW ]</button>
 
         <div id="results" class="results-area">
             <div id="deal-verdict" style="text-align:center; font-weight:bold; margin-bottom:10px; font-size: 1.2rem;"></div>
-            <div id="dc-warning" class="warning-text" style="display:none;">⚠️ DOUBLE CLOSE REQUIRED (FEE > $15K)</div>
-            
             <div class="summary-card">
                 <div class="summary-line"><span>Total Debt Cleared:</span> <span id="res-debt">$0</span></div>
-                <div class="summary-line"><span>Relo + Bonus:</span> <span id="res-relo">$0</span></div>
+                <div class="summary-line"><span>Relocation Benefit:</span> <span id="res-relo">$0</span></div>
                 <div class="summary-line" style="border-top:1px solid #ccc; padding-top:10px; font-weight:bold; color:var(--main-teal); font-size:1.1rem;">
-                    <span>SELLER TOTAL:</span> <span id="res-total">$0</span>
+                    <span>GUARANTEED SELLER TOTAL:</span> <span id="res-total">$0</span>
                 </div>
             </div>
-            
             <button id="sync-btn" class="sync-btn" onclick="syncDeal()">Push to SignNow (Packet A)</button>
 
             <div id="office-view" class="office-view">
-                <span class="section-label" style="color:#92400e;">Office Logic Only</span>
+                <span class="section-label" style="color:#92400e;">Internal Logic Only</span>
+                <div id="dc-warning" class="warning-text">⚠️ DOUBLE CLOSE REQUIRED (FEE > $15K)</div>
                 <label class="field-label">Day 12: Power Hour Bid</label>
                 <input type="text" id="power-bid" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this); runAssessment();">
                 <div class="summary-line"><span>Firm Net:</span> <span id="off-firm">$0</span></div>
-                <div class="summary-line"><span>Seller Bonus:</span> <span id="off-surplus">$0</span></div>
+                <div class="summary-line" style="color:var(--safe-green); font-weight:bold;"><span>Addendum Surplus (30%):</span> <span id="off-surplus">$0</span></div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    function formatCurrency(input) {
-        let n = input.value.replace(/\D/g, "");
-        input.value = n === "" ? "" : Number(n).toLocaleString();
-    }
+    let activeCounterId = null;
 
-    function parseVal(id) {
-        return parseFloat(document.getElementById(id).value.replace(/,/g, "")) || 0;
-    }
-
+    function formatCurrency(input) { let n = input.value.replace(/\D/g, ""); input.value = n === "" ? "" : Number(n).toLocaleString(); }
+    function parseVal(id) { return parseFloat(document.getElementById(id).value.replace(/,/g, "")) || 0; }
+    
     function updateAuctionStatus() {
         const val = document.getElementById('auction-date').value;
         const banner = document.getElementById('auction-status');
         if(!val) return;
         const diff = Math.ceil((new Date(val) - new Date()) / (1000 * 60 * 60 * 24));
         banner.style.display = "block";
-        if(diff < 15) { banner.innerText = "🔴 RED LEAD (Auction < 15 Days)"; banner.style.backgroundColor = "#fee2e2"; banner.style.color = "#b91c1c"; }
-        else { banner.innerText = "🟢 GREEN LEAD (Safe Timeline)"; banner.style.backgroundColor = "#dcfce7"; banner.style.color = "#15803d"; }
+        banner.style.backgroundColor = (diff < 15) ? "#fee2e2" : "#dcfce7";
+        banner.style.color = (diff < 15) ? "#b91c1c" : "#15803d";
+        banner.innerText = (diff < 15) ? "🔴 RED LEAD (Auction < 15 Days)" : "🟢 GREEN LEAD (Safe Timeline)";
     }
 
-    function takePhoto(id) {
+    // Logic: Store which category Rosie is shooting, then open the camera
+    function triggerCam(counterId) {
+        activeCounterId = counterId;
         document.getElementById('cam').click();
-        let count = parseInt(document.getElementById(id).innerText);
-        document.getElementById(id).innerText = count + 1;
+    }
+
+    // Logic: Only increment the number if a file was actually picked
+    function fileSelected() {
+        const fileInput = document.getElementById('cam');
+        if (fileInput.files.length > 0 && activeCounterId) {
+            let el = document.getElementById(activeCounterId);
+            el.innerText = parseInt(el.innerText) + 1;
+            // Clear input so she can take another photo of the same category if needed
+            fileInput.value = ""; 
+        }
     }
 
     function toggleOffice() { var x = document.getElementById('office-view'); x.style.display = (x.style.display === 'block') ? 'none' : 'block'; }
@@ -161,13 +133,13 @@
         const finalPrice = (power > 0) ? power : (arv * 0.70) - repairs;
         const pool = finalPrice - (debt + reloBase);
         
-        let bonus = (pool > 15000) ? Math.min(pool * 0.30, 15000) : 0;
+        let bonus = (pool > 0) ? pool * 0.30 : 0;
         let firm = (pool > 0) ? pool - bonus : 0;
 
         document.getElementById('results').style.display = "block";
         document.getElementById('res-debt').innerText = "$" + debt.toLocaleString();
-        document.getElementById('res-relo').innerText = "$" + (reloBase + bonus).toLocaleString();
-        document.getElementById('res-total').innerText = "$" + (debt + reloBase + bonus).toLocaleString();
+        document.getElementById('res-relo').innerText = "$" + reloBase.toLocaleString();
+        document.getElementById('res-total').innerText = "$" + (debt + reloBase).toLocaleString();
         document.getElementById('off-firm').innerText = "$" + firm.toLocaleString();
         document.getElementById('off-surplus').innerText = "$" + bonus.toLocaleString();
 
@@ -175,18 +147,9 @@
         const dcWarn = document.getElementById('dc-warning');
         const syncBtn = document.getElementById('sync-btn');
 
-        // Logic Gate: $10k Minimum Firm Profit [cite: 2026-02-12]
-        if(firm < 10000) {
-            verdict.innerText = "DENIED";
-            verdict.style.color = "red";
-            syncBtn.style.display = "none";
-        } else {
-            verdict.innerText = "APPROVED";
-            verdict.style.color = "green";
-            syncBtn.style.display = "block";
-        }
+        if(firm < 10000) { verdict.innerText = "DENIED"; verdict.style.color = "red"; syncBtn.style.display = "none"; } 
+        else { verdict.innerText = "APPROVED"; verdict.style.color = "green"; syncBtn.style.display = "block"; }
 
-        // Logic Gate: Double Close Warning [cite: 2026-02-17]
         dcWarn.style.display = (firm > 15000) ? "block" : "none";
 
         if(power > 0) {
@@ -197,11 +160,7 @@
             syncBtn.style.backgroundColor = "var(--action-red)";
         }
     }
-
-    async function syncDeal() {
-        const isManual = confirm("How are we signing?\n\nOK = In-Person (Manual)\nCancel = Digital (SignNow)");
-        alert("✅ Calculation Synced to Master Chart");
-    }
+    function syncDeal() { confirm("How are we signing?\n\nOK = In-Person (Manual)\nCancel = Digital (SignNow)"); alert("✅ Calculation Synced"); }
 </script>
 </body>
 </html>
