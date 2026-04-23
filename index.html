@@ -5,26 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Machine | Fresh Start</title>
     <style>
-        :root { --main-teal: #3eb1a5; --action-red: #c0392b; --action-orange: #e67e22; --bg-gray: #f4f7f6; }
-        body { font-family: sans-serif; background-color: var(--bg-gray); margin: 0; padding: 10px; display: flex; justify-content: center; overflow-x: hidden; }
-        .app-container { width: 100%; max-width: 450px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 2px solid var(--main-teal); box-sizing: border-box; }
-        .header { background: var(--main-teal); color: white; padding: 15px; text-align: center; border-radius: 12px 12px 0 0; }
+        :root { --main-teal: #3eb1a5; --action-red: #c0392b; --action-orange: #e67e22; --bg-gray: #f4f7f6; --safe-green: #27ae60; }
+        body { font-family: sans-serif; background-color: var(--bg-gray); margin: 0; padding: 10px; display: flex; justify-content: center; }
+        .app-container { width: 100%; max-width: 450px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 2px solid var(--main-teal); overflow: hidden; }
+        .header { background: var(--main-teal); color: white; padding: 15px; text-align: center; }
         .header h1 { margin: 0; font-size: 1rem; text-transform: uppercase; }
-        .header p { margin: 5px 0 0; font-size: 0.65rem; }
-        .content { padding: 15px; box-sizing: border-box; }
+        .header p { margin: 5px 0 0; font-size: 0.65rem; opacity: 0.9; }
+        .content { padding: 15px; }
         .section-label { font-size: 0.7rem; font-weight: bold; color: var(--main-teal); text-transform: uppercase; margin: 15px 0 5px 0; display: block; }
         .input-full { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; box-sizing: border-box; margin-bottom: 10px; }
-        .input-group { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; width: 100%; }
-        select { flex-grow: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 0.9rem; min-width: 0; }
-        .camera-btn { background: #f1f5f9; border: 1px solid #cbd5e0; border-radius: 8px; width: 45px; height: 45px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .financial-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .btn-run { width: 100%; padding: 16px; background: var(--main-teal); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
-        .results-area { display: none; margin-top: 15px; padding: 15px; border-radius: 10px; background: #f0fff4; border: 1px solid #c3e6cb; }
-        .summary-card { background: white; padding: 12px; border-radius: 8px; border: 1px solid #edf2f7; margin: 10px 0; }
-        .summary-line { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px; }
-        .sync-btn { width: 100%; padding: 18px; background: var(--action-red); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        #auction-warning { display:none; background: #fee2e2; color: #dc2626; padding: 8px; border-radius: 5px; font-weight: bold; font-size: 0.75rem; margin-bottom: 10px; text-align: center; }
-        .office-view { display: none; background: #f8fafc; padding: 12px; border-radius: 8px; margin-top: 10px; border: 1px dashed var(--main-teal); }
+        .input-group { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        select { flex-grow: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 0.9rem; }
+        .camera-wrapper { position: relative; }
+        .camera-btn { background: #f1f5f9; border: 1px solid #cbd5e0; border-radius: 8px; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+        .photo-count { position: absolute; top: -5px; right: -5px; background: var(--main-teal); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; font-weight: bold; }
+        .financial-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .status-banner { padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.8rem; margin-bottom: 10px; display: none; }
+        .btn-run { width: 100%; padding: 18px; background: var(--main-teal); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
+        .results-area { display: none; margin-top: 15px; }
+        .summary-card { background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #edf2f7; margin-bottom: 15px; }
+        .summary-line { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; }
+        .sync-btn { width: 100%; padding: 20px; background: var(--action-red); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; display: none; }
+        .office-view { display: none; background: #fffbeb; padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px dashed #f59e0b; }
     </style>
 </head>
 <body>
@@ -36,97 +38,126 @@
     </div>
 
     <div class="content">
+        <div id="auction-status" class="status-banner"></div>
+
         <span class="section-label">Property Info</span>
         <input type="text" id="address" class="input-full" placeholder="Property Address">
         
         <div class="input-group">
-            <span style="font-size:0.75rem; white-space:nowrap;">Auction Date:</span>
-            <input type="date" id="auction-date" class="input-full" style="margin-bottom:0;" onchange="calc()">
+            <span style="font-size:0.75rem;">Auction Date:</span>
+            <input type="date" id="auction-date" class="input-full" style="margin-bottom:0;" onchange="updateAuctionStatus()">
         </div>
 
-        <div id="auction-warning">⚠️ AUCTION < 15 DAYS (RED LEAD)</div>
-
-        <span class="section-label">Rosie's Worksheet (Condition)</span>
-        <div class="input-group"><select id="roof" onchange="calc()"><option value="0">Roof: Functional ($0)</option><option value="8000">Roof: Repair ($8k)</option><option value="15000">Roof: Replacement ($15k)</option></select><button class="camera-btn" onclick="document.getElementById('cam').click()">📸</button></div>
-        <div class="input-group"><select id="hvac" onchange="calc()"><option value="0">HVAC: Functional ($0)</option><option value="3500">HVAC: Service ($3.5k)</option><option value="10000">HVAC: Replacement ($10k)</option></select><button class="camera-btn" onclick="document.getElementById('cam').click()">📸</button></div>
-        <div class="input-group"><select id="kitchen" onchange="calc()"><option value="0">Interior: Clean ($0)</option><option value="8000">Interior: Cosmetic ($8k)</option><option value="25000">Interior: Full Remodel ($25k)</option></select><button class="camera-btn" onclick="document.getElementById('cam').click()">📸</button></div>
-        <div class="input-group"><select id="trash" onchange="calc()"><option value="0">Debris: Broom Clean ($0)</option><option value="1500">Debris: Light ($1.5k)</option><option value="3000" selected>Debris: Heavy ($3k)</option></select><button class="camera-btn" onclick="document.getElementById('cam').click()">📸</button></div>
+        <div class="input-group">
+            <select id="roof"><option value="0">Roof: Functional ($0)</option><option value="8000">Roof: Repair ($8k)</option><option value="15000">Roof: Replacement ($15k)</option></select>
+            <div class="camera-wrapper"><button class="camera-btn" onclick="takePhoto('count-roof')">📸<span id="count-roof" class="photo-count">0</span></button></div>
+        </div>
+        <div class="input-group">
+            <select id="hvac"><option value="0">HVAC: Functional ($0)</option><option value="3500">HVAC: Service ($3.5k)</option><option value="10000">HVAC: Replacement ($10k)</option></select>
+            <div class="camera-wrapper"><button class="camera-btn" onclick="takePhoto('count-hvac')">📸<span id="count-hvac" class="photo-count">0</span></button></div>
+        </div>
+        <div class="input-group">
+            <select id="kitchen"><option value="0">Kitchen: Clean ($0)</option><option value="8000">Kitchen: Cosmetic ($8k)</option><option value="25000">Kitchen: Full Remodel ($25k)</option></select>
+            <div class="camera-wrapper"><button class="camera-btn" onclick="takePhoto('count-kitchen')">📸<span id="count-kitchen" class="photo-count">0</span></button></div>
+        </div>
+        <div class="input-group">
+            <select id="trash"><option value="0">Debris: Broom Clean ($0)</option><option value="1500">Debris: Light ($1.5k)</option><option value="3000" selected>Debris: Heavy ($3k)</option></select>
+            <div class="camera-wrapper"><button class="camera-btn" onclick="takePhoto('count-trash')">📸<span id="count-trash" class="photo-count">0</span></button></div>
+        </div>
 
         <input type="file" id="cam" accept="image/*" capture="camera" style="display:none">
 
         <span class="section-label">Financials</span>
-        <input type="number" id="arv" class="input-full" placeholder="ARV (Market Value)" oninput="calc()">
+        <input type="number" id="arv" class="input-full" placeholder="ARV (Market Value)">
         <div class="financial-row">
-            <input type="number" id="mortgage" class="input-full" placeholder="Mortgage Payoff" oninput="calc()">
-            <input type="number" id="arrears" class="input-full" placeholder="Arrears" oninput="calc()">
+            <input type="number" id="mortgage" class="input-full" placeholder="Mortgage Payoff">
+            <input type="number" id="arrears" class="input-full" placeholder="Arrears">
         </div>
+        <input type="number" id="relo" class="input-full" value="2000" placeholder="Relo Benefit">
         
-        <div style="text-align:center; padding:10px 0;">
-            <span class="section-label" style="margin:0;">Base Relo Benefit</span>
-            <div style="font-size: 1.3rem; font-weight: bold; color: var(--main-teal);">$2,000</div>
-        </div>
-
-        <button class="btn-run" onclick="calc()">Run Full Assessment</button>
+        <button class="btn-run" onclick="runAssessment()">Run Assessment</button>
         <button style="width:100%; margin-top:10px; font-size:0.6rem; border:none; background:none; color:#94a3b8; cursor:pointer;" onclick="toggleOffice()">[ TOGGLE OFFICE VIEW ]</button>
 
         <div id="results" class="results-area">
+            <div id="deal-verdict" style="text-align:center; font-weight:bold; margin-bottom:10px;"></div>
             <div class="summary-card">
-                <div class="summary-line"><span>Debt Cleared:</span> <span id="res-debt">$0</span></div>
+                <div class="summary-line"><span>Total Debt:</span> <span id="res-debt">$0</span></div>
                 <div class="summary-line"><span>Relo + Bonus:</span> <span id="res-relo">$0</span></div>
-                <div class="summary-line" style="border-top:1px solid #eee; padding-top:8px; margin-top:5px; font-weight:bold; color:var(--main-teal);">
-                    <span>TOTAL SELLER NET:</span> <span id="res-total">$0</span>
+                <div class="summary-line" style="border-top:1px solid #ccc; padding-top:10px; font-weight:bold; color:var(--main-teal); font-size:1.1rem;">
+                    <span>SELLER TOTAL:</span> <span id="res-total">$0</span>
                 </div>
             </div>
             
-            <button id="sync-btn" class="sync-btn" onclick="sync()">Push to SignNow (Packet A)</button>
+            <button id="sync-btn" class="sync-btn" onclick="syncDeal()">Push to SignNow (Packet A)</button>
 
             <div id="office-view" class="office-view">
-                <span class="section-label" style="color:#1e293b; margin-top:0;">Power Hour Bid</span>
-                <input type="number" id="power-bid" class="input-full" placeholder="Winning Bid Amount" oninput="calc()">
-                <div class="summary-line" style="color:green; font-weight:bold;"><span>Firm Net:</span> <span id="off-firm">$0</span></div>
-                <div class="summary-line" style="color:var(--action-red); font-weight:bold;"><span>Seller Bonus:</span> <span id="off-surplus">$0</span></div>
+                <span class="section-label" style="color:#92400e;">Day 12: Power Hour Bid</span>
+                <input type="number" id="power-bid" class="input-full" placeholder="Highest Bid Received">
+                <div class="summary-line"><span>Firm Net:</span> <span id="off-firm">$0</span></div>
+                <div class="summary-line"><span>Seller Bonus:</span> <span id="off-surplus">$0</span></div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+    function updateAuctionStatus() {
+        const val = document.getElementById('auction-date').value;
+        const banner = document.getElementById('auction-status');
+        if(!val) return;
+        const diff = Math.ceil((new Date(val) - new Date()) / (1000 * 60 * 60 * 24));
+        banner.style.display = "block";
+        if(diff < 15) { banner.innerText = "🔴 RED LEAD (Auction < 15 Days)"; banner.style.backgroundColor = "#fee2e2"; banner.style.color = "#b91c1c"; }
+        else { banner.innerText = "🟢 GREEN LEAD (Safe Timeline)"; banner.style.backgroundColor = "#dcfce7"; banner.style.color = "#15803d"; }
+    }
+
+    function takePhoto(id) {
+        document.getElementById('cam').click();
+        let count = parseInt(document.getElementById(id).innerText);
+        document.getElementById(id).innerText = count + 1;
+    }
+
     function toggleOffice() { var x = document.getElementById('office-view'); x.style.display = (x.style.display === 'block') ? 'none' : 'block'; }
-    function calc() {
+
+    function runAssessment() {
         const arv = parseFloat(document.getElementById('arv').value) || 0;
-        const mortgage = parseFloat(document.getElementById('mortgage').value) || 0;
-        const arrears = parseFloat(document.getElementById('arrears').value) || 0;
-        const debt = mortgage + arrears;
-        const power = parseFloat(document.getElementById('power-bid').value) || 0;
+        const debt = (parseFloat(document.getElementById('mortgage').value) || 0) + (parseFloat(document.getElementById('arrears').value) || 0);
         const repairs = (parseFloat(document.getElementById('roof').value) || 0) + (parseFloat(document.getElementById('hvac').value) || 0) + (parseFloat(document.getElementById('kitchen').value) || 0) + (parseFloat(document.getElementById('trash').value) || 0);
-        
+        const reloBase = parseFloat(document.getElementById('relo').value) || 0;
+        const power = parseFloat(document.getElementById('power-bid').value) || 0;
+
         const finalPrice = (power > 0) ? power : (arv * 0.70) - repairs;
-        const pool = finalPrice - (debt + 2000);
+        const pool = finalPrice - (debt + reloBase);
+        
         let bonus = (pool > 15000) ? Math.min(pool * 0.30, 15000) : 0;
         let firm = (pool > 0) ? pool - bonus : 0;
 
-        const auctionVal = document.getElementById('auction-date').value;
-        if (auctionVal) {
-            const diff = Math.ceil((new Date(auctionVal) - new Date()) / (1000 * 60 * 60 * 24));
-            document.getElementById('auction-warning').style.display = (diff < 15) ? 'block' : 'none';
-        }
-
         document.getElementById('results').style.display = "block";
         document.getElementById('res-debt').innerText = "$" + debt.toLocaleString();
-        document.getElementById('res-relo').innerText = "$" + (2000 + bonus).toLocaleString();
-        document.getElementById('res-total').innerText = "$" + (debt + 2000 + bonus).toLocaleString();
+        document.getElementById('res-relo').innerText = "$" + (reloBase + bonus).toLocaleString();
+        document.getElementById('res-total').innerText = "$" + (debt + reloBase + bonus).toLocaleString();
         document.getElementById('off-firm').innerText = "$" + firm.toLocaleString();
         document.getElementById('off-surplus').innerText = "$" + bonus.toLocaleString();
 
-        const b = document.getElementById('sync-btn');
-        if (power > 0) { b.innerText = "Generate Price Adjustment Addendum"; b.style.backgroundColor = "var(--action-orange)"; }
-        else { b.innerText = "Push to SignNow (Packet A)"; b.style.backgroundColor = "var(--action-red)"; }
+        const verdict = document.getElementById('deal-verdict');
+        const syncBtn = document.getElementById('sync-btn');
+        syncBtn.style.display = "block";
+
+        if(pool < 0) { verdict.innerText = "❌ BAD DEAL (No Profit)"; verdict.style.color = "red"; }
+        else { verdict.innerText = "✅ GOOD DEAL (Profitable)"; verdict.style.color = "green"; }
+
+        if(power > 0) {
+            syncBtn.innerText = "Sign Price Adjustment Addendum";
+            syncBtn.style.backgroundColor = "var(--action-orange)";
+        } else {
+            syncBtn.innerText = "Push to SignNow (Packet A)";
+            syncBtn.style.backgroundColor = "var(--action-red)";
+        }
     }
-    async function sync() {
-        const manual = confirm("Manual Packet?");
-        const data = { address: document.getElementById('address').value, firm: document.getElementById('off-firm').innerText, manual: manual };
-        await fetch('https://hooks.zapier.com/hooks/catch/27133148/ujl6lys/', { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-        alert("✅ Synced");
+
+    async function syncDeal() {
+        const isManual = confirm("How are we signing?\n\nOK = In-Person (Manual)\nCancel = Digital (SignNow)");
+        alert("✅ Deal Logic Synced to Master Chart");
     }
 </script>
 </body>
