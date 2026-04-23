@@ -13,19 +13,25 @@
         .header p { margin: 4px 0 0; font-size: 0.6rem; opacity: 0.9; }
         .content { padding: 12px; }
         .section-label { font-size: 0.7rem; font-weight: bold; color: var(--main-teal); text-transform: uppercase; margin: 10px 0 5px 0; display: block; }
-        .field-box { margin-bottom: 10px; }
+        .field-box { margin-bottom: 12px; }
         .field-label { font-size: 0.75rem; font-weight: bold; color: #4a5568; margin-bottom: 4px; display: block; }
-        .input-full { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
+        .input-full { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; box-sizing: border-box; -webkit-appearance: none; }
         
-        /* RESPONSIVE GRID: Stacks on mobile, side-by-side on laptop */
-        .financial-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+        /* FIXED MOBILE STACKING: Force vertical layout on mobile devices */
+        .financial-grid { display: flex; flex-direction: column; gap: 10px; }
         
+        /* Laptop/Desktop adjustment: Side-by-side only on wider screens */
+        @media (min-width: 600px) {
+            .financial-grid { flex-direction: row; }
+            .financial-grid .field-box { flex: 1; }
+        }
+
         .input-group { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-        select { flex-grow: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 0.9rem; min-width: 0; }
+        select { flex-grow: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 0.9rem; min-width: 0; background: white; }
         .camera-btn { background: #f1f5f9; border: 1px solid #cbd5e0; border-radius: 8px; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; flex-shrink: 0; }
         .photo-count { position: absolute; top: -5px; right: -5px; background: var(--main-teal); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; font-weight: bold; }
-        .status-banner { padding: 8px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.75rem; margin-bottom: 10px; display: none; }
-        .btn-run { width: 100%; padding: 16px; background: var(--main-teal); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
+        .status-banner { padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.75rem; margin-bottom: 12px; display: none; }
+        .btn-run { width: 100%; padding: 18px; background: var(--main-teal); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
         .results-area { display: none; margin-top: 15px; }
         .summary-card { background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #edf2f7; margin-bottom: 15px; }
         .summary-line { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; }
@@ -75,10 +81,12 @@
 
         <span class="section-label">Financials</span>
         <div class="field-box"><label class="field-label">After Repair Value (ARV)</label><input type="text" id="arv" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)"></div>
+        
         <div class="financial-grid">
             <div class="field-box"><label class="field-label">Mortgage Payoff</label><input type="text" id="mortgage" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)"></div>
             <div class="field-box"><label class="field-label">Total Arrears</label><input type="text" id="arrears" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)"></div>
         </div>
+        
         <div class="field-box"><label class="field-label">Relo Benefit</label><input type="text" id="relo" class="input-full currency" value="2,000" oninput="formatCurrency(this)"></div>
         
         <button class="btn-run" onclick="runAssessment()">Run Assessment</button>
