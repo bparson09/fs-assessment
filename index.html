@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Machine | Fresh Start</title>
+    <style>
+        :root { --main-teal: #3eb1a5; --action-red: #c0392b; --action-orange: #e67e22; --bg-gray: #f4f7f6; }
+        body { font-family: sans-serif; background-color: var(--bg-gray); margin: 0; padding: 10px; display: flex; justify-content: center; }
+        .app-container { width: 100%; max-width: 480px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); overflow: hidden; border: 2px solid var(--main-teal); }
+        .header { background: var(--main-teal); color: white; padding: 20px; text-align: center; }
+        .header h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
+        .header p { margin: 5px 0 0; font-size: 0.7rem; opacity: 0.9; }
+        .content { padding: 20px; }
+        .section-label { font-size: 0.75rem; font-weight: bold; color: var(--main-teal); text-transform: uppercase; margin: 15px 0 8px 0; display: block; }
+        .input-group { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        select, input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 10px; font-size: 1rem; }
+        .camera-btn { background: #f1f5f9; border: 1px solid #cbd5e0; border-radius: 10px; width: 45px; height: 45px; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
+        .btn-run { width: 100%; padding: 18px; background: var(--main-teal); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin: 20px 0; text-transform: uppercase; }
+        .btn-office { width: 100%; padding: 10px; background: #f8fafc; color: #64748b; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 0.75rem; cursor: pointer; }
+        .results-area { display: none; margin-top: 20px; padding: 15px; border-radius: 15px; background: #f0fff4; border: 1px solid #c3e6cb; }
+        .summary-card { background: white; padding: 15px; border-radius: 10px; text-align: left; margin: 10px 0; border: 1px solid #edf2f7; }
+        .summary-line { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
+        .sync-btn { width: 100%; padding: 20px; background: var(--action-red); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .office-view { display: none; background: #f8fafc; padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px dashed var(--main-teal); text-align: left; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>PROPERTY ASSESSMENT</h1>
+        <p>"You Move On Your Own Terms—And We Help You Get There"</p>
+    </div>
+
+    <div class="content">
+        <span class="section-label">Property Info</span>
+        <input type="text" id="address" placeholder="Property Address" style="width:100%; box-sizing:border-box;">
+
+        <span class="section-label">Rosie's Worksheet (Condition)</span>
+        
+        <div class="input-group">
+            <select id="roof" onchange="calc()"><option value="0">Roof: Functional ($0)</option><option value="8000">Roof: Repair ($8k)</option><option value="15000">Roof: Replacement ($15k)</option></select>
+            <button class="camera-btn" onclick="document.getElementById('cam').click()">📸</button>
+        </div>
+        <div class="input-group">
+            <select id="hvac" onchange="calc()"><option value="0">HVAC: Functional ($0)</option><option value="3500">HVAC: Service ($3.5k)</option><option value="10000">HVAC: Replacement ($10k)</option></select>
+            <button class="camera-btn" onclick="document.getElementById('cam').click()">📸</button>
+        </div>
+        <div class="input-group">
+            <select id="kitchen" onchange="calc()"><option value="0">Interior: Clean ($0)</option><option value="8000">Interior: Cosmetic ($8k)</option><option value="25000">Interior: Full Remodel ($25k)</option></select>
+            <button class="camera-btn" onclick="document.getElementById('cam').click()">📸</button>
+        </div>
+        <div class="input-group">
+            <select id="trash" onchange="calc()"><option value="0">Debris: Broom Clean ($0)</option><option value="1500">Debris: Light ($1.5k)</option><option value="3000" selected>Debris: Heavy ($3k)</option></select>
+            <button class="camera-btn" onclick="document.getElementById('cam').click()">📸</button>
+        </div>
+
+        <input type="file" id="cam" accept="image/*" capture="camera" style="display:none">
+
+        <span class="section-label">Financials</span>
+        <input type="number" id="arv" placeholder="ARV" oninput="calc()" style="width:100%; box-sizing:border-box; margin-bottom:10px;">
+        <input type="number" id="debt" placeholder="Total Debt" oninput="calc()" style="width:100%; box-sizing:border-box;">
+        
+        <div style="text-align:center; margin:15px 0;">
+            <span class="section-label">Base Relo Benefit</span>
+            <div style="font-size: 1.5rem; font-weight: bold; color: var(--main-teal);">2,000</div>
+        </div>
+
+        <button class="btn-run" onclick="calc()">Run Assessment</button>
+        <button class="btn-office" onclick="toggleOffice()">[ TOGGLE OFFICE VIEW ]</button>
+
+        <div id="results" class="results-area">
+            <div style="font-weight:bold; color:#2d3748; margin-bottom:10px;">✅ ELIGIBLE FOR FRESH START</div>
+            <div class="summary-card">
+                <div class="summary-line"><span>Debt Cleared:</span> <span id="res-debt">$0</span></div>
+                <div class="summary-line"><span>Relo + Bonus:</span> <span id="res-relo">$0</span></div>
+                <div class="summary-line" style="border-top:1px solid #eee; padding-top:8px; margin-top:8px; font-weight:bold; color:var(--main-teal); font-size:1.1rem;">
+                    <span>TOTAL SELLER NET:</span> <span id="res-total">$0</span>
+                </div>
+            </div>
+            
+            <button id="sync-btn" class="sync-btn" onclick="sync()">Push to SignNow (Packet A)</button>
+
+            <div id="office-view" class="office-view">
+                <span class="section-label" style="color:#1e293b; margin-top:0;">Power Hour: Final Bid Price</span>
+                <input type="number" id="power-bid" placeholder="Winning Bid Amount" oninput="calc()" style="width:100%; border:2px solid var(--main-teal); box-sizing:border-box;">
+                <div style="margin-top:15px;">
+                    <div class="summary-line" style="color:green; font-weight:bold;"><span>Firm True Net:</span> <span id="off-firm">$0.00</span></div>
+                    <div class="summary-line" style="color:var(--action-red); font-weight:bold;"><span>Seller Bonus (Cap $15k):</span> <span id="off-surplus">$0.00</span></div>
+                </div>
+            </div>
+
+            <div style="margin-top:20px; color:#94a3b8; font-size:0.7rem; cursor:pointer; text-transform:uppercase;" onclick="window.location.reload()">[ Start New Lead (Clear All) ]</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleOffice() {
+        var x = document.getElementById('office-view');
+        x.style.display = (x.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function calc() {
+        const arv = parseFloat(document.getElementById('arv').value) || 0;
+        const debt = parseFloat(document.getElementById('debt').value) || 0;
+        const power = parseFloat(document.getElementById('power-bid').value) || 0;
+        const repairs = (parseFloat(document.getElementById('roof').value) || 0) + (parseFloat(document.getElementById('hvac').value) || 0) + (parseFloat(document.getElementById('kitchen').value) || 0) + (parseFloat(document.getElementById('trash').value) || 0);
+        
+        const target = (power > 0) ? power : (arv * 0.70) - repairs;
+        const pool = target - (debt + 2000);
+        
+        // Split logic with 15k Hard Cap [cite: 2026-04-18]
+        let bonus = (pool > 15000) ? Math.min(pool * 0.30, 15000) : 0;
+        let firm = pool - bonus;
+
+        document.getElementById('results').style.display = "block";
+        document.getElementById('res-debt').innerText = "$" + debt.toLocaleString();
+        document.getElementById('res-relo').innerText = "$" + (2000 + bonus).toLocaleString();
+        document.getElementById('res-total').innerText = "$" + (debt + 2000 + bonus).toLocaleString();
+        document.getElementById('off-firm').innerText = "$" + firm.toLocaleString(undefined, {minimumFractionDigits:2});
+        document.getElementById('off-surplus').innerText = "$" + bonus.toLocaleString(undefined, {minimumFractionDigits:2});
+
+        const b = document.getElementById('sync-btn');
+        if (power > 0) { b.innerText = "Generate Price Adjustment Addendum"; b.style.backgroundColor = "var(--action-orange)"; }
+        else { b.innerText = "Push to SignNow (Packet A)"; b.style.backgroundColor = "var(--action-red)"; }
+    }
+
+    async function sync() {
+        const isManual = confirm("Senior / Flip Phone lead?\n\nOK = Manual\nCancel = Digital");
+        const data = { address: document.getElementById('address').value, firm: document.getElementById('off-firm').innerText, bonus: document.getElementById('off-surplus').innerText, manual: isManual };
+        await fetch('https://hooks.zapier.com/hooks/catch/27133148/ujl6lys/', { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        alert("✅ Synced to Master Chart");
+    }
+</script>
+</body>
+</html>
