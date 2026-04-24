@@ -13,7 +13,13 @@
         .login-box { width: 100%; max-width: 350px; text-align: center; }
         
         /* LOGO STYLE */
-        .app-logo { max-width: 320px; height: auto; margin-bottom: 25px; }
+.app-logo { 
+    width: 90%;          /* Uses 90% of the phone's width */
+    max-width: 320px;    /* But never gets bigger than 320px on a laptop */
+    height: auto; 
+    margin-bottom: 25px; 
+    display: block;      /* Helps with centering */
+}
 
         .login-input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; -webkit-appearance: none; }
         .btn-login { width: 100%; padding: 15px; background: var(--main-teal); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
