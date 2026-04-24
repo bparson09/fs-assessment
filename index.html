@@ -3,121 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fresh Start | Assessment Machine</title>
+    <title>Fresh Start Machine</title>
     <style>
-        :root { --brand: #2c3e50; --gold: #f39c12; --green: #27ae60; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        #gatekeeper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .login-box { text-align: center; padding: 40px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); width: 320px; }
-        .logo { font-size: 28px; font-weight: 900; color: var(--brand); letter-spacing: -1px; margin-bottom: 10px; }
-        select, input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 16px; }
-        .btn-entry { background: var(--brand); color: white; margin-top: 15px; }
-        #machine_ui { display: none; width: 90%; max-width: 400px; background: white; padding: 35px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .result { margin-top: 25px; padding: 25px; border-radius: 15px; text-align: center; color: white; font-weight: 800; font-size: 22px; display: none; }
-        .label { font-size: 12px; font-weight: 700; color: #999; text-transform: uppercase; margin-top: 15px; display: block; }
+        :root { --brand: #2c3e50; --gold: #f39c12; --green: #27ae60; --red: #e74c3c; }
+        body { font-family: sans-serif; background: #f4f7f6; margin: 0; display: flex; justify-content: center; padding: 20px; }
+        .container { width: 100%; max-width: 450px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .view-toggle { display: flex; margin-bottom: 20px; background: #eee; border-radius: 8px; padding: 5px; }
+        .view-toggle button { flex: 1; border: none; padding: 10px; cursor: pointer; border-radius: 5px; background: transparent; font-weight: bold; }
+        .view-toggle button.active { background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .calc-box { background: #f9f9f9; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 5px solid var(--brand); }
+        .result-pill { text-align: center; padding: 15px; border-radius: 10px; color: white; font-weight: bold; margin-top: 15px; font-size: 1.2rem; }
+        #gatekeeper { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display:flex; justify-content:center; align-items:center; }
     </style>
 </head>
 <body>
 
-    <div id="gatekeeper">
-        <div class="login-box">
-            <div class="logo">FRESH START</div>
-            <p style="color: #666; font-size: 14px; margin-bottom: 25px;">Assessment Machine v3.0</p>
-            <select id="user_identity">
-                <option value="">Choose Partner...</option>
-                <option value="Rosie">Rosie</option>
-                <option value="Admin">Admin</option>
-            </select>
-            <button class="btn-entry" onclick="unlock()">Enter Portal</button>
+<div id="gatekeeper">
+    <div style="text-align:center;">
+        <h2>FRESH START LOGIN</h2>
+        <select id="user_select"><option value="Rosie">Rosie</option><option value="Admin">Admin</option></select>
+        <button onclick="login()" style="width:100%; padding:10px; background:var(--brand); color:white; border-radius:8px;">Enter</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="view-toggle" id="toggle_bar" style="display:none;">
+        <button id="btn_field" class="active" onclick="setView('field')">FIELD VIEW</button>
+        <button id="btn_office" onclick="setView('office')">OFFICE VIEW</button>
+    </div>
+
+    <label>Property Address</label>
+    <input type="text" id="addr" placeholder="123 Main St">
+
+    <label>ARV</label>
+    <input type="number" id="arv" oninput="calculate()">
+
+    <label>Repairs</label>
+    <input type="number" id="rep" oninput="calculate()">
+
+    <label>Mortgage/Debt</label>
+    <input type="number" id="debt" oninput="calculate()">
+
+    <div id="office_section" style="display:none;">
+        <div class="calc-box">
+            <small>ESTIMATED WHOLESALE FEE</small>
+            <div id="fee_display" style="font-size:1.5rem; font-weight:bold;">$0</div>
+            <div id="method_display" style="color:var(--gold); font-size:0.8rem; font-weight:bold;">METHOD: ---</div>
         </div>
+        <div id="relo_warning" style="display:none; color:var(--red); font-size:0.8rem; margin-top:5px; font-weight:bold;">⚠️ LOW RELO WARNING</div>
     </div>
 
-    <div id="machine_ui">
-        <p style="font-size: 11px; text-transform: uppercase; color: #999; text-align: center; margin-bottom: 20px;">
-            Active Session: <span id="display_name" style="color: var(--brand); font-weight: bold;"></span>
-        </p>
-        
-        <span class="label">Property Address</span>
-        <input type="text" id="addr" placeholder="Street, City, State">
-        
-        <span class="label">After Repair Value (ARV)</span>
-        <input type="number" id="arv_val" placeholder="$0.00">
-        
-        <span class="label">Estimated Repairs</span>
-        <input type="number" id="rep_val" placeholder="$0.00">
-        
-        <span class="label">Mortgage Payoff + Arrears</span>
-        <input type="number" id="debt_val" placeholder="$0.00">
+    <div id="result_pill" class="result-pill" style="display:none;"></div>
 
-        <button onclick="runLogic()" style="background: var(--brand); color: white; margin-top: 25px;">Run Assessment</button>
-        
-        <div id="status_pill" class="result"></div>
-        
-        <button id="sync_btn" onclick="syncToZapier()" style="display:none; background: #eee; color: #333; margin-top: 15px;">Push to Master Chart</button>
-    </div>
+    <button onclick="sendToZapier()" id="sync_btn" style="width:100%; padding:15px; background:var(--brand); color:white; border:none; border-radius:10px; margin-top:20px; font-weight:bold; cursor:pointer;">PUSH TO MASTER CHART</button>
+</div>
 
-    <script>
-        // PASTE YOUR ZAPIER LINK HERE
-        const ZAPIER_URL = "https://hooks.zapier.com/hooks/catch/27133148/ujl6lys/";
-        let partner = "";
+<script>
+    const ZAPIER_URL = "YOUR_LINK_HERE"; // Put your Zapier link here
+    let currentRole = "Rosie";
 
-        function unlock() {
-            const user = document.getElementById('user_identity').value;
-            if(!user) return alert("Identify yourself.");
-            partner = user;
-            document.getElementById('display_name').innerText = user;
-            document.getElementById('gatekeeper').style.display = 'none';
-            document.getElementById('machine_ui').style.display = 'block';
+    function login() {
+        currentRole = document.getElementById('user_select').value;
+        document.getElementById('gatekeeper').style.display = 'none';
+        if(currentRole === "Admin") document.getElementById('toggle_bar').style.display = 'flex';
+    }
+
+    function setView(view) {
+        document.getElementById('office_section').style.display = (view === 'office') ? 'block' : 'none';
+        document.getElementById('btn_field').classList.toggle('active', view === 'field');
+        document.getElementById('btn_office').classList.toggle('active', view === 'office');
+    }
+
+    function calculate() {
+        const arv = parseFloat(document.getElementById('arv').value) || 0;
+        const rep = parseFloat(document.getElementById('rep').value) || 0;
+        const debt = parseFloat(document.getElementById('debt').value) || 0;
+
+        const mao = (arv * 0.7) - rep;
+        const fee = mao - debt;
+        const pill = document.getElementById('result_pill');
+
+        // Logic for Pill
+        pill.style.display = "block";
+        if (fee > 0) {
+            pill.innerText = "APPROVED";
+            pill.style.background = "var(--green)";
+        } else {
+            pill.innerText = "SEND FOR REVIEW";
+            pill.style.background = "var(--gold)";
         }
 
-        function runLogic() {
-            const arv = parseFloat(document.getElementById('arv_val').value) || 0;
-            const repairs = parseFloat(document.getElementById('rep_val').value) || 0;
-            const debt = parseFloat(document.getElementById('debt_val').value) || 0;
+        // Office View Updates
+        document.getElementById('fee_display').innerText = "$" + fee.toLocaleString();
+        document.getElementById('method_display').innerText = "METHOD: " + (fee < 15000 ? "ASSIGNMENT" : "DOUBLE CLOSE");
+        
+        const reloFunds = mao - debt; // Simplified for this logic
+        document.getElementById('relo_warning').style.display = (reloFunds < 2000) ? 'block' : 'none';
+    }
 
-            const bidRef = (arv * 0.7) - repairs - debt;
-            const pill = document.getElementById('status_pill');
-            const sync = document.getElementById('sync_btn');
-
-            pill.style.display = "block";
-            sync.style.display = "block";
-
-            if(bidRef > 0) {
-                pill.innerText = "APPROVED";
-                pill.style.background = "#27ae60";
-            } else {
-                pill.innerText = "SEND FOR REVIEW";
-                pill.style.background = "#f39c12";
-            }
-        }
-
-        async function syncToZapier() {
-            const btn = document.getElementById('sync_btn');
-            btn.innerText = "TRANSMITTING...";
-            btn.disabled = true;
-
-            const payload = {
-                partner: partner,
-                address: document.getElementById('addr').value,
-                arv: document.getElementById('arv_val').value,
-                repairs: document.getElementById('rep_val').value,
-                debt: document.getElementById('debt_val').value,
-                intake_date: new Date().toLocaleDateString() // Wakes up your spreadsheet Column G
-            };
-
-            try {
-                const res = await fetch(ZAPIER_URL, { method: 'POST', body: JSON.stringify(payload) });
-                if(res.ok) {
-                    alert("Deal Locked. Master Chart updated.");
-                    location.reload();
-                }
-            } catch (e) {
-                alert("Sync Error. Check your connection.");
-                btn.disabled = false;
-                btn.innerText = "Push to Master Chart";
-            }
-        }
-    </script>
+    async function sendToZapier() {
+        const btn = document.getElementById('sync_btn');
+        btn.innerText = "SYNCING...";
+        const data = {
+            address: document.getElementById('addr').value,
+            arv: document.getElementById('arv').value,
+            intake_date: new Date().toLocaleDateString()
+        };
+        const res = await fetch(ZAPIER_URL, { method: 'POST', body: JSON.stringify(data) });
+        if(res.ok) { alert("Sent!"); location.reload(); }
+    }
+</script>
 </body>
 </html>
