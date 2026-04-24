@@ -9,19 +9,28 @@
         body { font-family: sans-serif; background-color: var(--bg-gray); margin: 0; padding: 10px; display: flex; justify-content: center; }
         
         /* LOGIN SHIELD STYLES */
-        #gatekeeper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
-        .login-box { width: 100%; max-width: 350px; text-align: center; }
-        
+        #gatekeeper { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: white; z-index: 9999; display: flex; 
+            flex-direction: column; justify-content: center; align-items: center; 
+            padding: 20px; box-sizing: border-box; 
+        }
+
+        .login-box { 
+            width: 100%; max-width: 350px; 
+            text-align: center; /* Forces logo and inputs to center */
+        }
+
         /* LOGO STYLE */
-.app-logo { 
-    width: 90%;          
-    max-width: 320px;    
-    height: auto; 
-    margin-bottom: 25px; 
-    display: block;      
-    margin-left: auto;   /* Pushes from the left */
-    margin-right: auto;  /* Pushes from the right */
-}
+        .app-logo { 
+            width: 90%;          
+            max-width: 320px;    
+            height: auto; 
+            margin-bottom: 25px; 
+            display: inline-block; /* Works best with text-align: center */
+            margin-left: auto;
+            margin-right: auto;
+        }
 
         .login-input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; -webkit-appearance: none; }
         .btn-login { width: 100%; padding: 15px; background: var(--main-teal); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
