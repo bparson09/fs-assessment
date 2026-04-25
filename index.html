@@ -7,7 +7,7 @@
     <style>
         :root { --main-teal: #3eb1a5; --action-red: #c0392b; --action-orange: #e67e22; --bg-gray: #f4f7f6; --safe-green: #27ae60; --grey-review: #94a3b8; }
         
-        /* Mobile Flicker & Zoom Fix */
+        /* MOBILE FLICKER & ZOOM FIX */
         input, select, textarea { font-size: 16px !important; touch-action: manipulation; }
 
         body { font-family: sans-serif; background-color: var(--bg-gray); margin: 0; padding: 10px; display: flex; justify-content: center; }
@@ -200,7 +200,7 @@
         if(grossFee < 10000) {
             globalVerdict = "DENIED";
             verdictEl.innerText = "REVIEW REQUIRED";
-            verdictEl.style.color = "#64748b"; // Subtle Slate
+            verdictEl.style.color = "#64748b";
             syncBtn.innerText = "SEND FOR REVIEW";
             syncBtn.style.backgroundColor = "var(--grey-review)";
         } else {
@@ -225,8 +225,9 @@
             partner_share: document.getElementById('off-partner').innerText,
             seller_surplus: document.getElementById('off-surplus').innerText,
             total_debt: document.getElementById('res-debt').innerText,
+            relo_benefit: document.getElementById('res-relo').innerText,
             lead_color: leadColor,
-            final_verdict: globalVerdict, // NEW DATA FIELD FOR ZAPIER PATHS
+            final_verdict: globalVerdict, 
             move_window: document.getElementById('move-window').value,
             auction_date: document.getElementById('auction-date').value,
             timestamp: new Date().toLocaleString()
