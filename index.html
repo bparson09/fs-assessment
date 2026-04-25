@@ -7,35 +7,11 @@
     <style>
         :root { --main-teal: #3eb1a5; --action-red: #c0392b; --action-orange: #e67e22; --bg-gray: #f4f7f6; --safe-green: #27ae60; }
         body { font-family: sans-serif; background-color: var(--bg-gray); margin: 0; padding: 10px; display: flex; justify-content: center; }
-        
-        /* LOGIN SHIELD STYLES */
-        #gatekeeper { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: white; z-index: 9999; display: flex; 
-            flex-direction: column; justify-content: center; align-items: center; 
-            padding: 20px; box-sizing: border-box; 
-        }
-
-        .login-box { 
-            width: 100%; max-width: 350px; 
-            text-align: center; /* Forces logo and inputs to center */
-        }
-
-        /* LOGO STYLE */
-        .app-logo { 
-            width: 90%;          
-            max-width: 320px;    
-            height: auto; 
-            margin-bottom: 25px; 
-            display: inline-block; /* Works best with text-align: center */
-            margin-left: auto;
-            margin-right: auto;
-        }
-
+        #gatekeeper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        .login-box { width: 100%; max-width: 350px; text-align: center; }
+        .app-logo { width: 90%; max-width: 320px; height: auto; margin-bottom: 25px; display: inline-block; margin-left: auto; margin-right: auto; }
         .login-input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; -webkit-appearance: none; }
         .btn-login { width: 100%; padding: 15px; background: var(--main-teal); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-
-        /* YOUR PERFECT LAYOUT STYLES */
         .app-container { display: none; width: 100%; max-width: 450px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 2px solid var(--main-teal); overflow: hidden; }
         .header { background: var(--main-teal); color: white; padding: 12px; text-align: center; }
         .header h1 { margin: 0; font-size: 0.9rem; text-transform: uppercase; }
@@ -66,7 +42,6 @@
 <div id="gatekeeper">
     <div class="login-box">
         <img src="logo.png" onerror="this.src='logo.png.png'" alt="Fresh Start Solutions" class="app-logo">
-        
         <select id="user_identity" class="login-input">
             <option value="">Select Partner...</option>
             <option value="Rosie Searcy">Rosie Searcy</option>
@@ -84,6 +59,11 @@
 
     <div class="content">
         <div id="auction-status" class="status-banner"></div>
+
+        <div class="field-box">
+            <label class="field-label">Seller Name(s)</label>
+            <input type="text" id="seller_name" class="input-full" placeholder="John & Jane Doe">
+        </div>
 
         <div class="field-box">
             <label class="field-label">Property Address</label>
@@ -140,13 +120,10 @@
             <div id="office-view" class="office-view">
                 <span class="section-label" style="color:#92400e;"> Firm Gross Fee</span>
                 <div id="off-gross" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">$0</div>
-                
                 <span class="section-label" style="color:#92400e;"> Partner Share (22.5%)</span>
                 <div id="off-partner" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">$0</div>
-                
                 <span class="section-label" style="color:#92400e;"> Seller Bonus</span>
                 <div id="off-surplus" style="font-size:1.1rem; font-weight:bold; color:var(--safe-green); margin-bottom:5px;">$0</div>
-                
                 <div id="dc-warning" class="warning-text">⚠️ DOUBLE CLOSE REQUIRED (FEE > $15K)</div>
                 <div id="cap-note" style="font-size:0.6rem; color:#92400e; text-align:right; display:none;">* $15k Max Cap Applied</div>
             </div>
@@ -176,15 +153,8 @@
         if(!val) return;
         const diff = Math.ceil((new Date(val) - new Date()) / (1000 * 60 * 60 * 24));
         banner.style.display = "block";
-        if(diff < 15) { 
-            leadColor = "RED";
-            banner.style.backgroundColor = "#fee2e2"; banner.style.color = "#b91c1c";
-            banner.innerText = "🔴 RED LEAD (Auction < 15 Days)";
-        } else { 
-            leadColor = "GREEN";
-            banner.style.backgroundColor = "#dcfce7"; banner.style.color = "#15803d";
-            banner.innerText = "🟢 GREEN LEAD (Safe Timeline)";
-        }
+        if(diff < 15) { leadColor = "RED"; banner.style.backgroundColor = "#fee2e2"; banner.style.color = "#b91c1c"; banner.innerText = "🔴 RED LEAD (Auction < 15 Days)"; } 
+        else { leadColor = "GREEN"; banner.style.backgroundColor = "#dcfce7"; banner.style.color = "#15803d"; banner.innerText = "🟢 GREEN LEAD (Safe Timeline)"; }
     }
 
     function triggerCam(counterId) { activeCounterId = counterId; document.getElementById('cam').click(); }
@@ -203,21 +173,17 @@
         const debt = parseVal('mortgage') + parseVal('arrears');
         const repairs = (parseFloat(document.getElementById('roof').value) || 0) + (parseFloat(document.getElementById('hvac').value) || 0) + (parseFloat(document.getElementById('kitchen').value) || 0) + (parseFloat(document.getElementById('trash').value) || 0);
         const reloBase = parseVal('relo');
-
         const finalPrice = (arv * 0.70) - repairs;
         const grossFee = finalPrice - (debt + reloBase);
-        
         let bonus = (grossFee > 10000) ? (grossFee - 10000) * 0.30 : 0;
         const capApplied = (bonus > 15000);
         if(capApplied) { bonus = 15000; }
-        
         const partnerShare = (grossFee > 0) ? grossFee * 0.225 : 0;
 
         document.getElementById('results').style.display = "block";
         document.getElementById('res-debt').innerText = "$" + debt.toLocaleString();
         document.getElementById('res-relo').innerText = "$" + reloBase.toLocaleString();
         document.getElementById('res-total').innerText = "$" + (debt + reloBase).toLocaleString();
-        
         document.getElementById('off-gross').innerText = "$" + (grossFee > 0 ? Math.round(grossFee) : 0).toLocaleString();
         document.getElementById('off-partner').innerText = "$" + Math.round(partnerShare).toLocaleString();
         document.getElementById('off-surplus').innerText = "$" + Math.round(bonus).toLocaleString();
@@ -225,36 +191,33 @@
 
         const verdict = document.getElementById('deal-verdict');
         const syncBtn = document.getElementById('sync-btn');
-
         if(grossFee < 10000) { verdict.innerText = "DENIED"; verdict.style.color = "red"; syncBtn.style.display = "none"; } 
         else { verdict.innerText = "APPROVED"; verdict.style.color = "green"; syncBtn.style.display = "block"; }
-
         document.getElementById('dc-warning').style.display = (grossFee > 15000) ? "block" : "none";
     }
 
     async function syncDeal() {
+        const totalRepairs = (parseFloat(document.getElementById('roof').value) || 0) + (parseFloat(document.getElementById('hvac').value) || 0) + (parseFloat(document.getElementById('kitchen').value) || 0) + (parseFloat(document.getElementById('trash').value) || 0);
         const data = {
             partner: currentUser,
+            seller_name: document.getElementById('seller_name').value,
             address: document.getElementById('address').value,
+            arv: document.getElementById('arv').value,
+            repairs: totalRepairs,
             gross_fee: document.getElementById('off-gross').innerText,
             partner_share: document.getElementById('off-partner').innerText,
             seller_surplus: document.getElementById('off-surplus').innerText,
             total_debt: document.getElementById('res-debt').innerText,
             lead_color: leadColor,
             move_window: document.getElementById('move-window').value,
+            auction_date: document.getElementById('auction-date').value,
             timestamp: new Date().toLocaleString()
         };
         try {
-            await fetch('https://hooks.zapier.com/hooks/catch/27133148/ujl6lys/', {
-                method: 'POST',
-                mode: 'no-cors', 
-                body: JSON.stringify(data)
-            });
+            await fetch('https://hooks.zapier.com/hooks/catch/27133148/ujl6lys/', { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
             alert("✅ Assessment Synced to Master Chart!");
             location.reload();
-        } catch (e) {
-            alert("⚠️ Sync failed.");
-        }
+        } catch (e) { alert("⚠️ Sync failed."); }
     }
 </script>
 </body>
