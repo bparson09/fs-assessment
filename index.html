@@ -32,9 +32,7 @@
         .photo-count { position: absolute; top: -5px; right: -5px; background: var(--main-teal); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; font-weight: bold; }
         .status-banner { padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.75rem; margin-bottom: 12px; display: none; }
         
-        /* STANDARDIZED ACTION BUTTONS */
         .btn-action-master { width: 100%; padding: 18px; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-        
         .btn-run { background: var(--main-teal); margin-top: 20px; }
         .results-area { display: none; margin-top: 15px; }
         .summary-card { background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #edf2f7; margin-bottom: 15px; }
@@ -134,6 +132,19 @@
 
         <div id="results" class="results-area">
             <div id="deal-verdict" style="text-align:center; font-weight:bold; margin-bottom:10px; font-size: 1.1rem;"></div>
+            
+            <div id="office-view" class="office-view">
+                <div id="off-gross" style="display:none;">$0</div>
+
+                <span class="field-label" style="color:#92400e; text-transform: uppercase;">Partner Share</span>
+                <div id="off-partner" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">$0</div>
+                
+                <span class="field-label" style="color:#92400e; text-transform: uppercase;">Additional Seller Bonus</span>
+                <div id="off-surplus" style="font-size:1.1rem; font-weight:bold; color:var(--safe-green); margin-bottom:5px;">$0</div>
+                
+                <div id="dc-warning" class="warning-text">⚠️ DOUBLE CLOSE REQUIRED (FEE > $15K)</div>
+            </div>
+
             <div class="summary-card">
                 <div class="summary-line"><span>Total Debt Cleared:</span> <span id="res-debt">$0</span></div>
                 <div class="summary-line"><span>Relocation Benefit:</span> <span id="res-relo">$0</span></div>
@@ -142,17 +153,6 @@
                 </div>
             </div>
             <button id="sync-btn" class="btn-action-master sync-btn" onclick="syncDeal()">GENERATE PACKET A</button>
-
-            <div id="office-view" class="office-view">
-                <span class="section-label" style="color:#92400e;"> Firm Gross Fee</span>
-                <div id="off-gross" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">$0</div>
-                <span class="section-label" style="color:#92400e;"> Partner Share (22.5%)</span>
-                <div id="off-partner" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">$0</div>
-                <span class="section-label" style="color:#92400e;"> Seller Bonus</span>
-                <div id="off-surplus" style="font-size:1.1rem; font-weight:bold; color:var(--safe-green); margin-bottom:5px;">$0</div>
-                <div id="dc-warning" class="warning-text">⚠️ DOUBLE CLOSE REQUIRED (FEE > $15K)</div>
-                <div id="cap-note" style="font-size:0.6rem; color:#92400e; text-align:right; display:none;">* $15k Max Cap Applied</div>
-            </div>
         </div>
     </div>
 </div>
@@ -203,13 +203,15 @@
         const finalPrice = (arv * 0.70) - repairs;
         const grossFee = finalPrice - (debt + reloBase);
         let bonus = (grossFee > 10000) ? (grossFee - 10000) * 0.30 : 0;
-        if(bonus > 15000) { bonus = 15000; document.getElementById('cap-note').style.display = "block"; } else { document.getElementById('cap-note').style.display = "none"; }
+        if(bonus > 15000) { bonus = 15000; } 
         const partnerShare = (grossFee > 0) ? grossFee * 0.225 : 0;
 
         document.getElementById('results').style.display = "block";
         document.getElementById('res-debt').innerText = "$" + debt.toLocaleString();
         document.getElementById('res-relo').innerText = "$" + reloBase.toLocaleString();
         document.getElementById('res-total').innerText = "$" + (debt + reloBase).toLocaleString();
+        
+        // SAVE CALCULATED DATA IN BACKGROUND
         document.getElementById('off-gross').innerText = "$" + (grossFee > 0 ? Math.round(grossFee) : 0).toLocaleString();
         document.getElementById('off-partner').innerText = "$" + Math.round(partnerShare).toLocaleString();
         document.getElementById('off-surplus').innerText = "$" + Math.round(bonus).toLocaleString();
