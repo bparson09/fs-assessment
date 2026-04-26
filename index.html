@@ -21,7 +21,7 @@
         .header h1 { margin: 0; font-size: 0.9rem; text-transform: uppercase; }
         .header p { margin: 4px 0 0; font-size: 0.6rem; opacity: 0.9; }
         .content { padding: 12px; }
-        .section-label { font-size: 0.7rem; font-weight: bold; color: var(--main-teal); text-transform: uppercase; margin: 10px 0 5px 0; display: block; }
+        .section-label { font-size: 0.7rem; font-weight: bold; color: var(--main-teal); text-transform: uppercase; margin: 15px 0 8px 0; display: block; border-bottom: 1px solid #eee; padding-bottom: 4px; }
         .field-box { margin-bottom: 12px; }
         .field-label { font-size: 0.75rem; font-weight: bold; color: #4a5568; margin-bottom: 4px; display: block; }
         .input-full { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; -webkit-appearance: none; }
@@ -32,7 +32,7 @@
         .camera-btn { background: #f1f5f9; border: 1px solid #cbd5e0; border-radius: 8px; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; flex-shrink: 0; }
         .photo-count { position: absolute; top: -5px; right: -5px; background: var(--main-teal); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; font-weight: bold; }
         .status-banner { padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.75rem; margin-bottom: 12px; display: none; }
-        .btn-run { width: 100%; padding: 18px; background: var(--main-teal); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
+        .btn-run { width: 100%; padding: 18px; background: var(--main-teal); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 20px; text-transform: uppercase; }
         .results-area { display: none; margin-top: 15px; }
         .summary-card { background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #edf2f7; margin-bottom: 15px; }
         .summary-line { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; }
@@ -89,14 +89,6 @@
             </div>
         </div>
 
-        <span class="section-label">Property Condition</span>
-        <div class="input-group"><select id="roof"><option value="0">Roof: Functional ($0)</option><option value="8000">Roof: Repair ($8k)</option><option value="15000">Roof: Replacement ($15k)</option></select><button class="camera-btn" onclick="triggerCam('count-roof')">📸<span id="count-roof" class="photo-count">0</span></button></div>
-        <div class="input-group"><select id="hvac"><option value="0">HVAC: Functional ($0)</option><option value="3500">HVAC: Service ($3.5k)</option><option value="10000">HVAC: Replacement ($10k)</option></select><button class="camera-btn" onclick="triggerCam('count-hvac')">📸<span id="count-hvac" class="photo-count">0</span></button></div>
-        <div class="input-group"><select id="kitchen"><option value="0">Kitchen: Clean ($0)</option><option value="8000">Kitchen: Cosmetic ($8k)</option><option value="25000">Kitchen: Full Remodel ($25k)</option></select><button class="camera-btn" onclick="triggerCam('count-kitchen')">📸<span id="count-kitchen" class="photo-count">0</span></button></div>
-        <div class="input-group"><select id="trash"><option value="0">Debris: Broom Clean ($0)</option><option value="1500">Debris: Light ($1.5k)</option><option value="3000" selected>Debris: Heavy ($3k)</option></select><button class="camera-btn" onclick="triggerCam('count-trash')">📸<span id="count-trash" class="photo-count">0</span></button></div>
-
-        <input type="file" id="cam" accept="image/*" capture="camera" style="display:none" onchange="fileSelected()">
-
         <span class="section-label">Financials</span>
         <div class="field-box"><label class="field-label">After Repair Value (ARV)</label><input type="text" id="arv" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)"></div>
         
@@ -106,7 +98,34 @@
         </div>
         
         <div class="field-box"><label class="field-label">Relo Benefit</label><input type="text" id="relo" class="input-full currency" value="2,000" oninput="formatCurrency(this)"></div>
-        
+
+        <span class="section-label">Property Condition</span>
+        <div class="input-group"><select id="roof"><option value="0">Roof: Functional ($0)</option><option value="8000">Roof: Repair ($8k)</option><option value="15000">Roof: Replacement ($15k)</option></select><button class="camera-btn" onclick="triggerCam('count-roof')">📸<span id="count-roof" class="photo-count">0</span></button></div>
+        <div class="input-group"><select id="hvac"><option value="0">HVAC: Functional ($0)</option><option value="3500">HVAC: Service ($3.5k)</option><option value="10000">HVAC: Replacement ($10k)</option></select><button class="camera-btn" onclick="triggerCam('count-hvac')">📸<span id="count-hvac" class="photo-count">0</span></button></div>
+        <div class="input-group"><select id="kitchen"><option value="0">Kitchen: Clean ($0)</option><option value="8000">Kitchen: Cosmetic ($8k)</option><option value="25000">Kitchen: Full Remodel ($25k)</option></select><button class="camera-btn" onclick="triggerCam('count-kitchen')">📸<span id="count-kitchen" class="photo-count">0</span></button></div>
+        <div class="input-group"><select id="trash"><option value="0">Debris: Broom Clean ($0)</option><option value="1500">Debris: Light ($1.5k)</option><option value="3000" selected>Debris: Heavy ($3k)</option></select><button class="camera-btn" onclick="triggerCam('count-trash')">📸<span id="count-trash" class="photo-count">0</span></button></div>
+
+        <span class="section-label">Verification & Documents</span>
+        <div class="financial-grid">
+            <div class="field-box"><label class="field-label">Lender Name</label><input type="text" id="lender_name" class="input-full" placeholder="e.g. Chase Bank"></div>
+            <div class="field-box"><label class="field-label">Loan Number</label><input type="text" id="loan_number" class="input-full" placeholder="123456789"></div>
+        </div>
+
+        <div class="input-group">
+            <div style="flex-grow:1; font-size:0.75rem; color:#4a5568;">Mortgage Statement (Front/Back)</div>
+            <button class="camera-btn" onclick="triggerCam('count-statement')">📸<span id="count-statement" class="photo-count">0</span></button>
+        </div>
+        <div class="input-group">
+            <div style="flex-grow:1; font-size:0.75rem; color:#4a5568;">Seller I.D. (Front)</div>
+            <button class="camera-btn" onclick="triggerCam('count-id-front')">📸<span id="count-id-front" class="photo-count">0</span></button>
+        </div>
+        <div class="input-group">
+            <div style="flex-grow:1; font-size:0.75rem; color:#4a5568;">Seller I.D. (Back)</div>
+            <button class="camera-btn" onclick="triggerCam('count-id-back')">📸<span id="count-id-back" class="photo-count">0</span></button>
+        </div>
+
+        <input type="file" id="cam" accept="image/*" capture="camera" style="display:none" onchange="fileSelected()">
+
         <button class="btn-run" onclick="runAssessment()">Run Assessment</button>
         <button id="toggle-office-btn" style="width:100%; margin-top:10px; font-size:0.6rem; border:none; background:none; color:#94a3b8; cursor:pointer; display:none;" onclick="toggleOffice()">[ TOGGLE OFFICE VIEW ]</button>
 
@@ -230,6 +249,14 @@
             final_verdict: globalVerdict, 
             move_window: document.getElementById('move-window').value,
             auction_date: document.getElementById('auction-date').value,
+            
+            // NEW FIELDS IN SYNC
+            lender_name: document.getElementById('lender_name').value,
+            loan_number: document.getElementById('loan_number').value,
+            statement_photo_count: document.getElementById('count-statement').innerText,
+            id_front_photo_count: document.getElementById('count-id-front').innerText,
+            id_back_photo_count: document.getElementById('count-id-back').innerText,
+            
             timestamp: new Date().toLocaleString()
         };
         try {
