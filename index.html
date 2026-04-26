@@ -7,7 +7,6 @@
     <style>
         :root { --main-teal: #3eb1a5; --action-red: #c0392b; --action-orange: #e67e22; --bg-gray: #f4f7f6; --safe-green: #27ae60; --grey-review: #94a3b8; }
         
-        /* MOBILE FLICKER & ZOOM FIX */
         input, select, textarea { font-size: 16px !important; touch-action: manipulation; }
 
         body { font-family: sans-serif; background-color: var(--bg-gray); margin: 0; padding: 10px; display: flex; justify-content: center; }
@@ -21,7 +20,7 @@
         .header h1 { margin: 0; font-size: 0.9rem; text-transform: uppercase; }
         .header p { margin: 4px 0 0; font-size: 0.6rem; opacity: 0.9; }
         .content { padding: 12px; }
-        .section-label { font-size: 0.7rem; font-weight: bold; color: var(--main-teal); text-transform: uppercase; margin: 15px 0 8px 0; display: block; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+        .section-label { font-size: 0.7rem; font-weight: bold; color: var(--main-teal); text-transform: uppercase; margin: 18px 0 10px 0; display: block; border-bottom: 1px solid #eee; padding-bottom: 4px; }
         .field-box { margin-bottom: 12px; }
         .field-label { font-size: 0.75rem; font-weight: bold; color: #4a5568; margin-bottom: 4px; display: block; }
         .input-full { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; -webkit-appearance: none; }
@@ -32,11 +31,15 @@
         .camera-btn { background: #f1f5f9; border: 1px solid #cbd5e0; border-radius: 8px; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; flex-shrink: 0; }
         .photo-count { position: absolute; top: -5px; right: -5px; background: var(--main-teal); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; font-weight: bold; }
         .status-banner { padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.75rem; margin-bottom: 12px; display: none; }
-        .btn-run { width: 100%; padding: 18px; background: var(--main-teal); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 20px; text-transform: uppercase; }
+        
+        /* STANDARDIZED ACTION BUTTONS */
+        .btn-action-master { width: 100%; padding: 18px; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        
+        .btn-run { background: var(--main-teal); margin-top: 20px; }
         .results-area { display: none; margin-top: 15px; }
         .summary-card { background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #edf2f7; margin-bottom: 15px; }
         .summary-line { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; }
-        .sync-btn { width: 100%; padding: 20px; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; display: none; }
+        .sync-btn { display: none; margin-top: 5px; }
         .office-view { display: none; background: #fffbeb; padding: 12px; border-radius: 10px; margin-top: 15px; border: 1px dashed #f59e0b; }
         .warning-text { color: #b91c1c; font-size: 0.75rem; font-weight: bold; margin-top: 8px; text-align: center; }
     </style>
@@ -112,21 +115,21 @@
         </div>
 
         <div class="input-group">
-            <div style="flex-grow:1; font-size:0.75rem; color:#4a5568;">Mortgage Statement (Front/Back)</div>
+            <div class="field-label" style="flex-grow:1; margin-bottom:0;">Mortgage Statement (Front/Back)</div>
             <button class="camera-btn" onclick="triggerCam('count-statement')">📸<span id="count-statement" class="photo-count">0</span></button>
         </div>
         <div class="input-group">
-            <div style="flex-grow:1; font-size:0.75rem; color:#4a5568;">Seller I.D. (Front)</div>
+            <div class="field-label" style="flex-grow:1; margin-bottom:0;">Seller I.D. (Front)</div>
             <button class="camera-btn" onclick="triggerCam('count-id-front')">📸<span id="count-id-front" class="photo-count">0</span></button>
         </div>
         <div class="input-group">
-            <div style="flex-grow:1; font-size:0.75rem; color:#4a5568;">Seller I.D. (Back)</div>
+            <div class="field-label" style="flex-grow:1; margin-bottom:0;">Seller I.D. (Back)</div>
             <button class="camera-btn" onclick="triggerCam('count-id-back')">📸<span id="count-id-back" class="photo-count">0</span></button>
         </div>
 
         <input type="file" id="cam" accept="image/*" capture="camera" style="display:none" onchange="fileSelected()">
 
-        <button class="btn-run" onclick="runAssessment()">Run Assessment</button>
+        <button class="btn-action-master btn-run" onclick="runAssessment()">Run Assessment</button>
         <button id="toggle-office-btn" style="width:100%; margin-top:10px; font-size:0.6rem; border:none; background:none; color:#94a3b8; cursor:pointer; display:none;" onclick="toggleOffice()">[ TOGGLE OFFICE VIEW ]</button>
 
         <div id="results" class="results-area">
@@ -138,7 +141,7 @@
                     <span>GUARANTEED SELLER TOTAL:</span> <span id="res-total">$0</span>
                 </div>
             </div>
-            <button id="sync-btn" class="sync-btn" onclick="syncDeal()">GENERATE PACKET A</button>
+            <button id="sync-btn" class="btn-action-master sync-btn" onclick="syncDeal()">GENERATE PACKET A</button>
 
             <div id="office-view" class="office-view">
                 <span class="section-label" style="color:#92400e;"> Firm Gross Fee</span>
@@ -249,14 +252,11 @@
             final_verdict: globalVerdict, 
             move_window: document.getElementById('move-window').value,
             auction_date: document.getElementById('auction-date').value,
-            
-            // NEW FIELDS IN SYNC
             lender_name: document.getElementById('lender_name').value,
             loan_number: document.getElementById('loan_number').value,
             statement_photo_count: document.getElementById('count-statement').innerText,
             id_front_photo_count: document.getElementById('count-id-front').innerText,
             id_back_photo_count: document.getElementById('count-id-back').innerText,
-            
             timestamp: new Date().toLocaleString()
         };
         try {
