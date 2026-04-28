@@ -273,6 +273,14 @@
 
     function closeModal() { document.getElementById('signing-modal').style.display = 'none'; }
 
+    // Helper to format date as MM/DD/YYYY
+    function formatNumericDate(dateObj) {
+        let mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+        let dd = String(dateObj.getDate()).padStart(2, '0');
+        let yyyy = dateObj.getFullYear();
+        return `${mm}/${dd}/${yyyy}`;
+    }
+
     async function executeSync(method) {
         closeModal();
 
@@ -282,19 +290,19 @@
         const reloVal = document.getElementById('relo').value;
         const moveWindow = document.getElementById('move-window').value;
 
-        // LEGAL LOGIC: DAY 1, DAY 15, and POWER HOUR
+        // LEGAL TIMELINE CALCULATION
         const today = new Date();
-        const agreementDate = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        const agreementDateNum = formatNumericDate(today);
 
-        // Closing is precisely the 15th day (Today + 14)
+        // Day 15 Closing
         const closingObj = new Date();
         closingObj.setDate(today.getDate() + 14);
-        const closingDateFinal = closingObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        const closingDateNum = formatNumericDate(closingObj);
 
-        // Power Hour is 8 days before Closing
+        // Power Hour (8 Days Before Closing)
         const powerHourObj = new Date(closingObj);
         powerHourObj.setDate(closingObj.getDate() - 8);
-        const powerHourFinal = powerHourObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        const powerHourNum = formatNumericDate(powerHourObj);
 
         const purchasePrice = (finalBidVal > 0) ? finalBidVal.toLocaleString() : (baseDebtRelo + 10000 + (floorGrossFee > 10000 ? (floorGrossFee-10000)*0.7 : 0)).toLocaleString();
 
@@ -312,11 +320,11 @@
             relo_benefit: reloVal,
             occupancy_days: moveWindow,
             
-            // THE AUTOMATED TIMELINE
-            agreement_date: agreementDate,
-            closing_date: closingDateFinal,
-            power_hour_date: powerHourFinal,
-            auction_actual: document.getElementById('auction-date').value, // Original auction date for record
+            // NUMERIC DATES FOR BRACKET COMPLIANCE
+            agreement_date: agreementDateNum,
+            closing_date: closingDateNum,
+            power_hour_date: powerHourNum,
+            auction_actual: document.getElementById('auction-date').value,
 
             partner_share: document.getElementById('off-partner-display').innerText,
             seller_bonus: document.getElementById('off-bonus-display').innerText,
