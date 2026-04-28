@@ -136,6 +136,7 @@
             <div class="field-label" style="flex-grow:1; margin-bottom:0;">Seller I.D. (Back)</div>
             <button class="camera-btn" onclick="triggerCam('count-id-back')">📸<span id="count-id-back" class="photo-count">0</span></button>
         </div>
+
         <input type="file" id="cam" accept="image/*" capture="camera" style="display:none" onchange="fileSelected()">
 
         <button class="btn-run btn-action-master" onclick="runAssessment()">Run Assessment</button>
@@ -145,10 +146,10 @@
             <div id="deal-verdict" style="text-align:center; font-weight:bold; margin-bottom:10px; font-size: 1.1rem;"></div>
             
             <div id="office-view" class="office-view">
-                <span class="field-label" style="color:#92400e; text-transform: uppercase;">Live Partner Share</span>
+                <span class="field-label" id="label-partner" style="color:#92400e; text-transform: uppercase;">Est. Partner Share</span>
                 <div id="off-partner-display" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">$0</div>
 
-                <span class="field-label" style="color:#92400e; text-transform: uppercase;">Live Seller Bonus (Capped $15k)</span>
+                <span class="field-label" id="label-bonus" style="color:#92400e; text-transform: uppercase;">Est. Seller Bonus (Capped $15k)</span>
                 <div id="off-bonus-display" style="font-size:1.1rem; font-weight:bold; color:var(--safe-green); margin-bottom:10px;">$0</div>
 
                 <div class="field-box">
@@ -175,9 +176,8 @@
     let activeCounterId = null;
     let leadColor = "Standard";
     let currentUser = "";
-    let globalVerdict = "";
-    let currentSyncMode = ""; 
     let baseDebtRelo = 0; 
+    let floorGrossFee = 0; // Baseline profit
 
     function unlockMachine() {
         currentUser = document.getElementById('user_identity').value;
@@ -215,23 +215,28 @@
     function updateLiveOfficeView() {
         const finalBid = parseVal('final_bid');
         const btn = document.getElementById('btn-addendum');
+        const partnerLabel = document.getElementById('label-partner');
+        const bonusLabel = document.getElementById('label-bonus');
         
+        let targetGross = (finalBid > 0) ? (finalBid - baseDebtRelo) : floorGrossFee;
+
         if (finalBid > 0) {
             btn.style.display = "block";
-            const liveGrossFee = finalBid - baseDebtRelo;
-            
-            let bonus = (liveGrossFee > 10000) ? (liveGrossFee - 10000) * 0.30 : 0;
-            if(bonus > 15000) bonus = 15000; 
-            
-            const partnerShare = (liveGrossFee > 0) ? liveGrossFee * 0.225 : 0;
-
-            document.getElementById('off-partner-display').innerText = "$" + Math.round(partnerShare).toLocaleString();
-            document.getElementById('off-bonus-display').innerText = "$" + Math.round(bonus).toLocaleString();
+            partnerLabel.innerText = "Live Partner Share";
+            bonusLabel.innerText = "Live Seller Bonus (Capped $15k)";
         } else {
             btn.style.display = "none";
-            document.getElementById('off-partner-display').innerText = "$0";
-            document.getElementById('off-bonus-display').innerText = "$0";
+            partnerLabel.innerText = "Est. Partner Share";
+            bonusLabel.innerText = "Est. Seller Bonus (Capped $15k)";
         }
+
+        // Calculate Shares
+        let bonus = (targetGross > 10000) ? (targetGross - 10000) * 0.30 : 0;
+        if(bonus > 15000) bonus = 15000; 
+        const partnerShare = (targetGross > 0) ? targetGross * 0.225 : 0;
+
+        document.getElementById('off-partner-display').innerText = "$" + Math.round(partnerShare).toLocaleString();
+        document.getElementById('off-bonus-display').innerText = "$" + Math.round(bonus).toLocaleString();
     }
 
     function runAssessment() {
@@ -242,27 +247,21 @@
         
         baseDebtRelo = debt + reloBase;
         const floorPrice = (arv * 0.70) - repairs;
-        const initialGrossFee = floorPrice - baseDebtRelo;
+        floorGrossFee = floorPrice - baseDebtRelo;
 
         document.getElementById('results').style.display = "block";
         document.getElementById('res-debt').innerText = "$" + debt.toLocaleString();
         document.getElementById('res-relo').innerText = "$" + reloBase.toLocaleString();
         document.getElementById('res-total').innerText = "$" + (baseDebtRelo).toLocaleString();
         
-        const initialPartner = (initialGrossFee > 0) ? initialGrossFee * 0.225 : 0;
-        let initialBonus = (initialGrossFee > 10000) ? (initialGrossFee - 10000) * 0.30 : 0;
-        if(initialBonus > 15000) initialBonus = 15000;
-
-        document.getElementById('off-partner-display').innerText = "$" + Math.round(initialPartner).toLocaleString();
-        document.getElementById('off-bonus-display').innerText = "$" + Math.round(initialBonus).toLocaleString();
+        // Initial run using Floor math
+        updateLiveOfficeView();
 
         const verdictEl = document.getElementById('deal-verdict');
-        if(initialGrossFee < 10000) {
-            globalVerdict = "DENIED";
+        if(floorGrossFee < 10000) {
             verdictEl.innerText = "REVIEW REQUIRED";
             verdictEl.style.color = "#64748b";
         } else {
-            globalVerdict = "APPROVED";
             verdictEl.innerText = "APPROVED";
             verdictEl.style.color = "green";
         }
@@ -283,7 +282,7 @@
             address: document.getElementById('address').value,
             document_type: currentSyncMode, 
             signing_method: method, 
-            final_bid_price: document.getElementById('final_bid').value,
+            final_bid_price: document.getElementById('final_bid').value || "N/A (Using Floor)",
             total_seller_net: document.getElementById('res-total').innerText,
             lender_name: document.getElementById('lender_name').value,
             loan_number: document.getElementById('loan_number').value,
