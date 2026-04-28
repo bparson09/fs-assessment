@@ -273,7 +273,6 @@
 
     function closeModal() { document.getElementById('signing-modal').style.display = 'none'; }
 
-    // Helper to format date as MM/DD/YYYY
     function formatNumericDate(dateObj) {
         let mm = String(dateObj.getMonth() + 1).padStart(2, '0');
         let dd = String(dateObj.getDate()).padStart(2, '0');
@@ -287,19 +286,17 @@
         const finalBidVal = parseVal('final_bid');
         const mortgageVal = parseVal('mortgage');
         const arrearsVal = parseVal('arrears');
+        const debtTotalVal = mortgageVal + arrearsVal;
         const reloVal = document.getElementById('relo').value;
         const moveWindow = document.getElementById('move-window').value;
+        const arvVal = document.getElementById('arv').value;
+        const verdictText = document.getElementById('deal-verdict').innerText;
 
-        // LEGAL TIMELINE CALCULATION
         const today = new Date();
         const agreementDateNum = formatNumericDate(today);
-
-        // Day 15 Closing
         const closingObj = new Date();
         closingObj.setDate(today.getDate() + 14);
         const closingDateNum = formatNumericDate(closingObj);
-
-        // Power Hour (8 Days Before Closing)
         const powerHourObj = new Date(closingObj);
         powerHourObj.setDate(closingObj.getDate() - 8);
         const powerHourNum = formatNumericDate(powerHourObj);
@@ -312,20 +309,20 @@
             address: document.getElementById('address').value,
             document_type: currentSyncMode, 
             signing_method: method, 
+            arv: arvVal,
+            gross_firm_fee: floorGrossFee.toLocaleString(),
+            verdict: verdictText,
             purchase_price: purchasePrice, 
             total_seller_net: document.getElementById('res-total').innerText,
             lender_name: document.getElementById('lender_name').value,
             loan_number: document.getElementById('loan_number').value,
-            debt_total: (mortgageVal + arrearsVal).toLocaleString(), 
+            debt_total: debtTotalVal.toLocaleString(), 
             relo_benefit: reloVal,
             occupancy_days: moveWindow,
-            
-            // NUMERIC DATES FOR BRACKET COMPLIANCE
             agreement_date: agreementDateNum,
             closing_date: closingDateNum,
             power_hour_date: powerHourNum,
             auction_actual: document.getElementById('auction-date').value,
-
             partner_share: document.getElementById('off-partner-display').innerText,
             seller_bonus: document.getElementById('off-bonus-display').innerText,
             lead_color: leadColor,
