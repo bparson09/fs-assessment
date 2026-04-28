@@ -6,20 +6,15 @@
     <title>The Machine | Fresh Start</title>
     <style>
         :root { --main-teal: #3eb1a5; --action-red: #c0392b; --action-orange: #e67e22; --bg-gray: #f4f7f6; --safe-green: #27ae60; --grey-review: #94a3b8; }
-        input, select, textarea { font-size: 16px !important; touch-action: manipulation; }
-        body { font-family: sans-serif; background-color: var(--bg-gray); margin: 0; padding: 10px; display: flex; justify-content: center; }
         
-        /* Modal Style for Digital/In-Person Choice */
-        #signing-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; justify-content:center; align-items:center; }
-        .modal-box { background:white; padding:25px; border-radius:15px; width:90%; max-width:320px; text-align:center; }
-        .modal-btn { width:100%; padding:15px; margin:10px 0; border-radius:10px; border:none; font-weight:bold; cursor:pointer; font-size:1rem; }
+        input, select, textarea { font-size: 16px !important; touch-action: manipulation; }
 
+        body { font-family: sans-serif; background-color: var(--bg-gray); margin: 0; padding: 10px; display: flex; justify-content: center; }
         #gatekeeper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .login-box { width: 100%; max-width: 350px; text-align: center; }
-        .app-logo { width: 90%; max-width: 320px; height: auto; margin-bottom: 25px; }
-        .login-input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; }
+        .app-logo { width: 90%; max-width: 320px; height: auto; margin-bottom: 25px; display: inline-block; margin-left: auto; margin-right: auto; }
+        .login-input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; -webkit-appearance: none; }
         .btn-login { width: 100%; padding: 15px; background: var(--main-teal); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        
         .app-container { display: none; width: 100%; max-width: 450px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 2px solid var(--main-teal); overflow: hidden; }
         .header { background: var(--main-teal); color: white; padding: 12px; text-align: center; }
         .header h1 { margin: 0; font-size: 0.9rem; text-transform: uppercase; }
@@ -28,34 +23,26 @@
         .section-label { font-size: 0.7rem; font-weight: bold; color: var(--main-teal); text-transform: uppercase; margin: 18px 0 10px 0; display: block; border-bottom: 1px solid #eee; padding-bottom: 4px; }
         .field-box { margin-bottom: 12px; }
         .field-label { font-size: 0.75rem; font-weight: bold; color: #4a5568; margin-bottom: 4px; display: block; }
-        .input-full { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+        .input-full { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; -webkit-appearance: none; }
         .financial-grid { display: flex; flex-direction: column; gap: 10px; }
         @media (min-width: 600px) { .financial-grid { flex-direction: row; } .financial-grid .field-box { flex: 1; } }
         .input-group { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-        select { flex-grow: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; background: white; }
-        .camera-btn { background: #f1f5f9; border: 1px solid #cbd5e0; border-radius: 8px; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; position: relative; }
-        .photo-count { position: absolute; top: -5px; right: -5px; background: var(--main-teal); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; }
+        select { flex-grow: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; min-width: 0; background: white; }
+        .camera-btn { background: #f1f5f9; border: 1px solid #cbd5e0; border-radius: 8px; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; flex-shrink: 0; }
+        .photo-count { position: absolute; top: -5px; right: -5px; background: var(--main-teal); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; font-weight: bold; }
         .status-banner { padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.75rem; margin-bottom: 12px; display: none; }
         
         .btn-action-master { width: 100%; padding: 18px; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         .btn-run { background: var(--main-teal); margin-top: 20px; }
-        .btn-addendum { background: var(--action-orange); display: none; margin-top: 10px; }
         .results-area { display: none; margin-top: 15px; }
-        .summary-card { background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #edf2f7; }
+        .summary-card { background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #edf2f7; margin-bottom: 15px; }
         .summary-line { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; }
+        .sync-btn { display: none; margin-top: 5px; }
         .office-view { display: none; background: #fffbeb; padding: 12px; border-radius: 10px; margin-top: 15px; border: 1px dashed #f59e0b; }
+        .warning-text { color: #b91c1c; font-size: 0.75rem; font-weight: bold; margin-top: 8px; text-align: center; }
     </style>
 </head>
 <body>
-
-<div id="signing-modal">
-    <div class="modal-box">
-        <h3>Choose Signing Method</h3>
-        <button class="modal-btn" style="background:var(--main-teal); color:white;" onclick="executeSync('Digital')">DIGITAL (Email/SignNow)</button>
-        <button class="modal-btn" style="background:var(--grey-review); color:white;" onclick="executeSync('In-Person')">IN-PERSON (Tablet/Hand)</button>
-        <button class="modal-btn" style="background:none; color:red;" onclick="closeModal()">Cancel</button>
-    </div>
-</div>
 
 <div id="gatekeeper">
     <div class="login-box">
@@ -113,10 +100,29 @@
         
         <div class="field-box"><label class="field-label">Relo Benefit</label><input type="text" id="relo" class="input-full currency" value="2,000" oninput="formatCurrency(this)"></div>
 
+        <span class="section-label">Property Condition</span>
+        <div class="input-group"><select id="roof"><option value="0">Roof: Functional ($0)</option><option value="8000">Roof: Repair ($8k)</option><option value="15000">Roof: Replacement ($15k)</option></select><button class="camera-btn" onclick="triggerCam('count-roof')">📸<span id="count-roof" class="photo-count">0</span></button></div>
+        <div class="input-group"><select id="hvac"><option value="0">HVAC: Functional ($0)</option><option value="3500">HVAC: Service ($3.5k)</option><option value="10000">HVAC: Replacement ($10k)</option></select><button class="camera-btn" onclick="triggerCam('count-hvac')">📸<span id="count-hvac" class="photo-count">0</span></button></div>
+        <div class="input-group"><select id="kitchen"><option value="0">Kitchen: Clean ($0)</option><option value="8000">Kitchen: Cosmetic ($8k)</option><option value="25000">Kitchen: Full Remodel ($25k)</option></select><button class="camera-btn" onclick="triggerCam('count-kitchen')">📸<span id="count-kitchen" class="photo-count">0</span></button></div>
+        <div class="input-group"><select id="trash"><option value="0">Debris: Broom Clean ($0)</option><option value="1500">Debris: Light ($1.5k)</option><option value="3000" selected>Debris: Heavy ($3k)</option></select><button class="camera-btn" onclick="triggerCam('count-trash')">📸<span id="count-trash" class="photo-count">0</span></button></div>
+
         <span class="section-label">Verification & Documents</span>
+        <div class="financial-grid">
+            <div class="field-box"><label class="field-label">Lender Name</label><input type="text" id="lender_name" class="input-full" placeholder="e.g. Chase Bank"></div>
+            <div class="field-box"><label class="field-label">Loan Number</label><input type="text" id="loan_number" class="input-full" placeholder="123456789"></div>
+        </div>
+
         <div class="input-group">
-            <div class="field-label" style="flex-grow:1; margin-bottom:0;">Seller I.D. (Front/Back)</div>
-            <button class="camera-btn" onclick="triggerCam('count-id')">📸<span id="count-id" class="photo-count">0</span></button>
+            <div class="field-label" style="flex-grow:1; margin-bottom:0;">Mortgage Statement (Front/Back)</div>
+            <button class="camera-btn" onclick="triggerCam('count-statement')">📸<span id="count-statement" class="photo-count">0</span></button>
+        </div>
+        <div class="input-group">
+            <div class="field-label" style="flex-grow:1; margin-bottom:0;">Seller I.D. (Front)</div>
+            <button class="camera-btn" onclick="triggerCam('count-id-front')">📸<span id="count-id-front" class="photo-count">0</span></button>
+        </div>
+        <div class="input-group">
+            <div class="field-label" style="flex-grow:1; margin-bottom:0;">Seller I.D. (Back)</div>
+            <button class="camera-btn" onclick="triggerCam('count-id-back')">📸<span id="count-id-back" class="photo-count">0</span></button>
         </div>
 
         <input type="file" id="cam" accept="image/*" capture="camera" style="display:none" onchange="fileSelected()">
@@ -128,25 +134,25 @@
             <div id="deal-verdict" style="text-align:center; font-weight:bold; margin-bottom:10px; font-size: 1.1rem;"></div>
             
             <div id="office-view" class="office-view">
-                <span class="field-label" style="color:#92400e; text-transform: uppercase;">Firm True Net</span>
-                <div id="off-gross-display" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">$0</div>
+                <div id="off-gross" style="display:none;">0</div>
 
-                <div class="field-box">
-                    <label class="field-label" style="color:#92400e;">Power Hour Final Bid ($)</label>
-                    <input type="text" id="final_bid" class="input-full currency" placeholder="Enter Final Bid..." oninput="formatCurrency(this); checkAddendumButton();">
-                </div>
-
-                <button id="btn-addendum" class="btn-action-master btn-addendum" onclick="prepareSync('ADDENDUM')">GENERATE PURCHASE PRICE ADDENDUM</button>
+                <span class="field-label" style="color:#92400e; text-transform: uppercase;">Partner Share</span>
+                <div id="off-partner" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">$0</div>
+                
+                <span class="field-label" style="color:#92400e; text-transform: uppercase;">Additional Seller Bonus</span>
+                <div id="off-surplus" style="font-size:1.1rem; font-weight:bold; color:var(--safe-green); margin-bottom:5px;">$0</div>
+                
+                <div id="dc-warning" class="warning-text">⚠️ DOUBLE CLOSE REQUIRED (FEE > $15K)</div>
             </div>
 
             <div class="summary-card">
                 <div class="summary-line"><span>Total Debt Cleared:</span> <span id="res-debt">$0</span></div>
-                <div class="summary-line"><span>Relo + Bonus:</span> <span id="res-relo">$0</span></div>
+                <div class="summary-line"><span>Relocation Benefit:</span> <span id="res-relo">$0</span></div>
                 <div class="summary-line" style="border-top:1px solid #ccc; padding-top:10px; font-weight:bold; color:var(--main-teal); font-size:1rem;">
-                    <span>TOTAL SELLER NET:</span> <span id="res-total">$0</span>
+                    <span>GUARANTEED SELLER TOTAL:</span> <span id="res-total">$0</span>
                 </div>
             </div>
-            <button id="sync-btn" class="btn-action-master" style="background:var(--action-red);" onclick="prepareSync('PACKET_A')">GENERATE PACKET A</button>
+            <button id="sync-btn" class="btn-action-master sync-btn" onclick="syncDeal()">GENERATE PACKET A</button>
         </div>
     </div>
 </div>
@@ -156,7 +162,6 @@
     let leadColor = "Standard";
     let currentUser = "";
     let globalVerdict = "";
-    let currentSyncMode = ""; // Either 'PACKET_A' or 'ADDENDUM'
 
     function unlockMachine() {
         currentUser = document.getElementById('user_identity').value;
@@ -188,68 +193,78 @@
             fileInput.value = ""; 
         }
     }
-
     function toggleOffice() { var x = document.getElementById('office-view'); x.style.display = (x.style.display === 'block') ? 'none' : 'block'; }
-
-    function checkAddendumButton() {
-        const bid = parseVal('final_bid');
-        document.getElementById('btn-addendum').style.display = (bid > 0) ? "block" : "none";
-    }
 
     function runAssessment() {
         const arv = parseVal('arv');
         const debt = parseVal('mortgage') + parseVal('arrears');
+        const repairs = (parseFloat(document.getElementById('roof').value) || 0) + (parseFloat(document.getElementById('hvac').value) || 0) + (parseFloat(document.getElementById('kitchen').value) || 0) + (parseFloat(document.getElementById('trash').value) || 0);
         const reloBase = parseVal('relo');
-        
-        // Logical profit capture (70/30 split logic as requested previously)
-        const finalPrice = (arv * 0.70);
-        const grossFee = finalPrice - debt - reloBase;
+        const finalPrice = (arv * 0.70) - repairs;
+        const grossFee = finalPrice - (debt + reloBase);
         let bonus = (grossFee > 10000) ? (grossFee - 10000) * 0.30 : 0;
-        if(bonus > 15000) bonus = 15000;
+        if(bonus > 15000) { bonus = 15000; } 
+        const partnerShare = (grossFee > 0) ? grossFee * 0.225 : 0;
 
         document.getElementById('results').style.display = "block";
         document.getElementById('res-debt').innerText = "$" + debt.toLocaleString();
-        document.getElementById('res-relo').innerText = "$" + (reloBase + bonus).toLocaleString();
-        document.getElementById('res-total').innerText = "$" + (debt + reloBase + bonus).toLocaleString();
-        document.getElementById('off-gross-display').innerText = "$" + Math.round(grossFee).toLocaleString();
+        document.getElementById('res-relo').innerText = "$" + reloBase.toLocaleString();
+        document.getElementById('res-total').innerText = "$" + (debt + reloBase).toLocaleString();
+        
+        // SAVE RAW NUMBER FOR SYNC WITHOUT SYMBOLS
+        document.getElementById('off-gross').innerText = Math.round(grossFee > 0 ? grossFee : 0);
+        document.getElementById('off-partner').innerText = "$" + Math.round(partnerShare).toLocaleString();
+        document.getElementById('off-surplus').innerText = "$" + Math.round(bonus).toLocaleString();
 
         const verdictEl = document.getElementById('deal-verdict');
+        const syncBtn = document.getElementById('sync-btn');
+        
+        syncBtn.style.display = "block";
+
         if(grossFee < 10000) {
             globalVerdict = "DENIED";
             verdictEl.innerText = "REVIEW REQUIRED";
             verdictEl.style.color = "#64748b";
+            syncBtn.innerText = "SEND FOR REVIEW";
+            syncBtn.style.backgroundColor = "var(--grey-review)";
         } else {
             globalVerdict = "APPROVED";
-            verdictEl.innerText = "ELIGIBLE FOR FRESH START";
+            verdictEl.innerText = "APPROVED";
             verdictEl.style.color = "green";
+            syncBtn.innerText = "GENERATE PACKET A";
+            syncBtn.style.backgroundColor = "var(--action-red)";
         }
+        document.getElementById('dc-warning').style.display = (grossFee > 15000) ? "block" : "none";
     }
 
-    function prepareSync(mode) {
-        currentSyncMode = mode;
-        document.getElementById('signing-modal').style.display = 'flex';
-    }
-
-    function closeModal() { document.getElementById('signing-modal').style.display = 'none'; }
-
-    async function executeSync(method) {
-        closeModal();
+    async function syncDeal() {
+        const totalRepairs = (parseFloat(document.getElementById('roof').value) || 0) + (parseFloat(document.getElementById('hvac').value) || 0) + (parseFloat(document.getElementById('kitchen').value) || 0) + (parseFloat(document.getElementById('trash').value) || 0);
         const data = {
             partner: currentUser,
             seller_name: document.getElementById('seller_name').value,
             address: document.getElementById('address').value,
-            document_type: currentSyncMode, // Packet A or Addendum
-            signing_method: method, // Digital or In-Person
-            final_bid_price: document.getElementById('final_bid').value,
-            total_seller_net: document.getElementById('res-total').innerText,
+            arv: document.getElementById('arv').value,
+            repairs: totalRepairs,
+            gross_fee: document.getElementById('off-gross').innerText, // Raw Number for Column N
+            partner_share: document.getElementById('off-partner').innerText,
+            seller_surplus: document.getElementById('off-surplus').innerText,
+            total_debt: document.getElementById('res-debt').innerText,
+            relo_benefit: document.getElementById('res-relo').innerText,
             lead_color: leadColor,
+            final_verdict: globalVerdict, 
+            move_window: document.getElementById('move-window').value,
+            auction_date: document.getElementById('auction-date').value,
+            lender_name: document.getElementById('lender_name').value,
+            loan_number: document.getElementById('loan_number').value,
+            statement_photo_count: document.getElementById('count-statement').innerText,
+            id_front_photo_count: document.getElementById('count-id-front').innerText,
+            id_back_photo_count: document.getElementById('count-id-back').innerText,
             timestamp: new Date().toLocaleString()
         };
-        
         try {
             await fetch('https://hooks.zapier.com/hooks/catch/27133148/ujl6lys/', { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-            alert("✅ " + currentSyncMode + " Synced via " + method);
-            if(currentSyncMode === "PACKET_A") location.reload();
+            alert("✅ Deal Synced! Firm Fee hidden; Admin dashboard updated.");
+            location.reload();
         } catch (e) { alert("⚠️ Sync failed."); }
     }
 </script>
