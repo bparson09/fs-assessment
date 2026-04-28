@@ -136,7 +136,6 @@
             <div class="field-label" style="flex-grow:1; margin-bottom:0;">Seller I.D. (Back)</div>
             <button class="camera-btn" onclick="triggerCam('count-id-back')">📸<span id="count-id-back" class="photo-count">0</span></button>
         </div>
-
         <input type="file" id="cam" accept="image/*" capture="camera" style="display:none" onchange="fileSelected()">
 
         <button class="btn-run btn-action-master" onclick="runAssessment()">Run Assessment</button>
@@ -146,17 +145,15 @@
             <div id="deal-verdict" style="text-align:center; font-weight:bold; margin-bottom:10px; font-size: 1.1rem;"></div>
             
             <div id="office-view" class="office-view">
-                <div id="off-gross-num" style="display:none;">0</div>
-                
-                <span class="field-label" style="color:#92400e; text-transform: uppercase;">Partner Share</span>
+                <span class="field-label" style="color:#92400e; text-transform: uppercase;">Live Partner Share</span>
                 <div id="off-partner-display" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">$0</div>
 
-                <span class="field-label" style="color:#92400e; text-transform: uppercase;">Seller Bonus (Surplus)</span>
+                <span class="field-label" style="color:#92400e; text-transform: uppercase;">Live Seller Bonus (Capped $15k)</span>
                 <div id="off-bonus-display" style="font-size:1.1rem; font-weight:bold; color:var(--safe-green); margin-bottom:10px;">$0</div>
 
                 <div class="field-box">
-                    <label class="field-label" style="color:#92400e;">Power Hour Final Bid ($)</label>
-                    <input type="text" id="final_bid" class="input-full currency" placeholder="Enter Final Bid..." oninput="formatCurrency(this); checkAddendumButton();">
+                    <label class="field-label" style="color:#92400e; font-weight: bold;">Power Hour Final Bid ($)</label>
+                    <input type="text" id="final_bid" class="input-full currency" placeholder="Enter Final Bid..." oninput="formatCurrency(this); updateLiveOfficeView();">
                 </div>
 
                 <button id="btn-addendum" class="btn-action-master btn-addendum" onclick="prepareSync('ADDENDUM')">GENERATE PURCHASE PRICE ADDENDUM</button>
@@ -180,6 +177,7 @@
     let currentUser = "";
     let globalVerdict = "";
     let currentSyncMode = ""; 
+    let baseDebtRelo = 0; 
 
     function unlockMachine() {
         currentUser = document.getElementById('user_identity').value;
@@ -214,9 +212,26 @@
 
     function toggleOffice() { var x = document.getElementById('office-view'); x.style.display = (x.style.display === 'block') ? 'none' : 'block'; }
 
-    function checkAddendumButton() {
-        const bid = parseVal('final_bid');
-        document.getElementById('btn-addendum').style.display = (bid > 0) ? "block" : "none";
+    function updateLiveOfficeView() {
+        const finalBid = parseVal('final_bid');
+        const btn = document.getElementById('btn-addendum');
+        
+        if (finalBid > 0) {
+            btn.style.display = "block";
+            const liveGrossFee = finalBid - baseDebtRelo;
+            
+            let bonus = (liveGrossFee > 10000) ? (liveGrossFee - 10000) * 0.30 : 0;
+            if(bonus > 15000) bonus = 15000; 
+            
+            const partnerShare = (liveGrossFee > 0) ? liveGrossFee * 0.225 : 0;
+
+            document.getElementById('off-partner-display').innerText = "$" + Math.round(partnerShare).toLocaleString();
+            document.getElementById('off-bonus-display').innerText = "$" + Math.round(bonus).toLocaleString();
+        } else {
+            btn.style.display = "none";
+            document.getElementById('off-partner-display').innerText = "$0";
+            document.getElementById('off-bonus-display').innerText = "$0";
+        }
     }
 
     function runAssessment() {
@@ -225,28 +240,24 @@
         const repairs = (parseFloat(document.getElementById('roof').value) || 0) + (parseFloat(document.getElementById('hvac').value) || 0) + (parseFloat(document.getElementById('kitchen').value) || 0) + (parseFloat(document.getElementById('trash').value) || 0);
         const reloBase = parseVal('relo');
         
-        const finalPrice = (arv * 0.70) - repairs;
-        const grossFee = finalPrice - (debt + reloBase);
-        
-        // 70/30 SPLIT LOGIC
-        let bonus = (grossFee > 10000) ? (grossFee - 10000) * 0.30 : 0;
-        if(bonus > 15000) bonus = 15000;
-        
-        // Partner Share calculation (22.5% of Gross)
-        const partnerShare = (grossFee > 0) ? grossFee * 0.225 : 0;
+        baseDebtRelo = debt + reloBase;
+        const floorPrice = (arv * 0.70) - repairs;
+        const initialGrossFee = floorPrice - baseDebtRelo;
 
         document.getElementById('results').style.display = "block";
         document.getElementById('res-debt').innerText = "$" + debt.toLocaleString();
-        document.getElementById('res-relo').innerText = "$" + reloBase.toLocaleString(); // Label fixed to "Relocation Benefit" only
-        document.getElementById('res-total').innerText = "$" + (debt + reloBase).toLocaleString();
+        document.getElementById('res-relo').innerText = "$" + reloBase.toLocaleString();
+        document.getElementById('res-total').innerText = "$" + (baseDebtRelo).toLocaleString();
         
-        // Hide Gross, Show Shares in Office View
-        document.getElementById('off-gross-num').innerText = Math.round(grossFee);
-        document.getElementById('off-partner-display').innerText = "$" + Math.round(partnerShare).toLocaleString();
-        document.getElementById('off-bonus-display').innerText = "$" + Math.round(bonus).toLocaleString();
+        const initialPartner = (initialGrossFee > 0) ? initialGrossFee * 0.225 : 0;
+        let initialBonus = (initialGrossFee > 10000) ? (initialGrossFee - 10000) * 0.30 : 0;
+        if(initialBonus > 15000) initialBonus = 15000;
+
+        document.getElementById('off-partner-display').innerText = "$" + Math.round(initialPartner).toLocaleString();
+        document.getElementById('off-bonus-display').innerText = "$" + Math.round(initialBonus).toLocaleString();
 
         const verdictEl = document.getElementById('deal-verdict');
-        if(grossFee < 10000) {
+        if(initialGrossFee < 10000) {
             globalVerdict = "DENIED";
             verdictEl.innerText = "REVIEW REQUIRED";
             verdictEl.style.color = "#64748b";
@@ -276,7 +287,6 @@
             total_seller_net: document.getElementById('res-total').innerText,
             lender_name: document.getElementById('lender_name').value,
             loan_number: document.getElementById('loan_number').value,
-            gross_fee: document.getElementById('off-gross-num').innerText,
             partner_share: document.getElementById('off-partner-display').innerText,
             seller_bonus: document.getElementById('off-bonus-display').innerText,
             lead_color: leadColor,
