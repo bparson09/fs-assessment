@@ -278,6 +278,12 @@
 
         // UPGRADE: CHAMELEON PRICE LOGIC
         const finalBidVal = parseVal('final_bid');
+        const mortgageVal = parseVal('mortgage');
+        const arrearsVal = parseVal('arrears');
+        const reloVal = document.getElementById('relo').value;
+        const moveWindow = document.getElementById('move-window').value;
+        const auctionDateVal = document.getElementById('auction-date').value;
+
         const purchasePrice = (finalBidVal > 0) ? finalBidVal.toLocaleString() : (baseDebtRelo + 10000 + (floorGrossFee > 10000 ? (floorGrossFee-10000)*0.7 : 0)).toLocaleString();
 
         // UPGRADE: CLEAN DATE LOGIC
@@ -295,6 +301,13 @@
             agreement_date: cleanDate,
             lender_name: document.getElementById('lender_name').value,
             loan_number: document.getElementById('loan_number').value,
+            
+            // KEY MAPPING FIXES FOR ZAPIER/SIGNNOW
+            debt_total: (mortgageVal + arrearsVal).toLocaleString(), 
+            relo_benefit: reloVal,
+            occupancy_days: moveWindow,
+            power_hour_date: auctionDateVal,
+
             partner_share: document.getElementById('off-partner-display').innerText,
             seller_bonus: document.getElementById('off-bonus-display').innerText,
             lead_color: leadColor,
