@@ -9,7 +9,6 @@
         input, select, textarea { font-size: 16px !important; touch-action: manipulation; }
         body { font-family: sans-serif; background-color: var(--bg-gray); margin: 0; padding: 10px; display: flex; justify-content: center; }
         
-        /* Signing Modal */
         #signing-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; justify-content:center; align-items:center; }
         .modal-box { background:white; padding:25px; border-radius:15px; width:90%; max-width:320px; text-align:center; }
         .modal-btn { width:100%; padding:15px; margin:10px 0; border-radius:10px; border:none; font-weight:bold; cursor:pointer; font-size:1rem; }
@@ -44,7 +43,6 @@
         .summary-card { background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #edf2f7; }
         .summary-line { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; }
         .office-view { display: none; background: #fffbeb; padding: 12px; border-radius: 10px; margin-top: 15px; border: 1px dashed #f59e0b; }
-        .warning-text { color: #b91c1c; font-size: 0.75rem; font-weight: bold; margin-top: 8px; text-align: center; }
     </style>
 </head>
 <body>
@@ -141,7 +139,7 @@
 
         <input type="file" id="cam" accept="image/*" capture="camera" style="display:none" onchange="fileSelected()">
 
-        <button class="btn-action-master btn-run" onclick="runAssessment()">Run Assessment</button>
+        <button class="btn-run btn-action-master" onclick="runAssessment()">Run Assessment</button>
         <button id="toggle-office-btn" style="width:100%; margin-top:10px; font-size:0.6rem; border:none; background:none; color:#94a3b8; cursor:pointer; display:none;" onclick="toggleOffice()">[ TOGGLE OFFICE VIEW ]</button>
 
         <div id="results" class="results-area">
@@ -149,8 +147,12 @@
             
             <div id="office-view" class="office-view">
                 <div id="off-gross-num" style="display:none;">0</div>
-                <span class="field-label" style="color:#92400e; text-transform: uppercase;">Firm True Net</span>
-                <div id="off-gross-display" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">$0</div>
+                
+                <span class="field-label" style="color:#92400e; text-transform: uppercase;">Partner Share</span>
+                <div id="off-partner-display" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">$0</div>
+
+                <span class="field-label" style="color:#92400e; text-transform: uppercase;">Seller Bonus (Surplus)</span>
+                <div id="off-bonus-display" style="font-size:1.1rem; font-weight:bold; color:var(--safe-green); margin-bottom:10px;">$0</div>
 
                 <div class="field-box">
                     <label class="field-label" style="color:#92400e;">Power Hour Final Bid ($)</label>
@@ -158,12 +160,11 @@
                 </div>
 
                 <button id="btn-addendum" class="btn-action-master btn-addendum" onclick="prepareSync('ADDENDUM')">GENERATE PURCHASE PRICE ADDENDUM</button>
-                <div id="dc-warning" class="warning-text">⚠️ DOUBLE CLOSE REQUIRED (FEE > $15K)</div>
             </div>
 
             <div class="summary-card">
                 <div class="summary-line"><span>Total Debt Cleared:</span> <span id="res-debt">$0</span></div>
-                <div class="summary-line"><span>Relo + Bonus:</span> <span id="res-relo">$0</span></div>
+                <div class="summary-line"><span>Relocation Benefit:</span> <span id="res-relo">$0</span></div>
                 <div class="summary-line" style="border-top:1px solid #ccc; padding-top:10px; font-weight:bold; color:var(--main-teal); font-size:1rem;">
                     <span>GUARANTEED SELLER TOTAL:</span> <span id="res-total">$0</span>
                 </div>
@@ -226,16 +227,23 @@
         
         const finalPrice = (arv * 0.70) - repairs;
         const grossFee = finalPrice - (debt + reloBase);
+        
+        // 70/30 SPLIT LOGIC
         let bonus = (grossFee > 10000) ? (grossFee - 10000) * 0.30 : 0;
         if(bonus > 15000) bonus = 15000;
+        
+        // Partner Share calculation (22.5% of Gross)
+        const partnerShare = (grossFee > 0) ? grossFee * 0.225 : 0;
 
         document.getElementById('results').style.display = "block";
         document.getElementById('res-debt').innerText = "$" + debt.toLocaleString();
-        document.getElementById('res-relo').innerText = "$" + (reloBase + bonus).toLocaleString();
-        document.getElementById('res-total').innerText = "$" + (debt + reloBase + bonus).toLocaleString();
+        document.getElementById('res-relo').innerText = "$" + reloBase.toLocaleString(); // Label fixed to "Relocation Benefit" only
+        document.getElementById('res-total').innerText = "$" + (debt + reloBase).toLocaleString();
         
+        // Hide Gross, Show Shares in Office View
         document.getElementById('off-gross-num').innerText = Math.round(grossFee);
-        document.getElementById('off-gross-display').innerText = "$" + Math.round(grossFee).toLocaleString();
+        document.getElementById('off-partner-display').innerText = "$" + Math.round(partnerShare).toLocaleString();
+        document.getElementById('off-bonus-display').innerText = "$" + Math.round(bonus).toLocaleString();
 
         const verdictEl = document.getElementById('deal-verdict');
         if(grossFee < 10000) {
@@ -247,7 +255,6 @@
             verdictEl.innerText = "APPROVED";
             verdictEl.style.color = "green";
         }
-        document.getElementById('dc-warning').style.display = (grossFee > 15000) ? "block" : "none";
     }
 
     function prepareSync(mode) {
@@ -269,10 +276,9 @@
             total_seller_net: document.getElementById('res-total').innerText,
             lender_name: document.getElementById('lender_name').value,
             loan_number: document.getElementById('loan_number').value,
-            statement_photos: document.getElementById('count-statement').innerText,
-            id_front_photos: document.getElementById('count-id-front').innerText,
-            id_back_photos: document.getElementById('count-id-back').innerText,
             gross_fee: document.getElementById('off-gross-num').innerText,
+            partner_share: document.getElementById('off-partner-display').innerText,
+            seller_bonus: document.getElementById('off-bonus-display').innerText,
             lead_color: leadColor,
             timestamp: new Date().toLocaleString()
         };
