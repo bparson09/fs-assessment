@@ -177,7 +177,8 @@
     let leadColor = "Standard";
     let currentUser = "";
     let baseDebtRelo = 0; 
-    let floorGrossFee = 0; // Baseline profit
+    let floorGrossFee = 0; 
+    let currentSyncMode = "";
 
     function unlockMachine() {
         currentUser = document.getElementById('user_identity').value;
@@ -230,7 +231,6 @@
             bonusLabel.innerText = "Est. Seller Bonus (Capped $15k)";
         }
 
-        // Calculate Shares
         let bonus = (targetGross > 10000) ? (targetGross - 10000) * 0.30 : 0;
         if(bonus > 15000) bonus = 15000; 
         const partnerShare = (targetGross > 0) ? targetGross * 0.225 : 0;
@@ -254,7 +254,6 @@
         document.getElementById('res-relo').innerText = "$" + reloBase.toLocaleString();
         document.getElementById('res-total').innerText = "$" + (baseDebtRelo).toLocaleString();
         
-        // Initial run using Floor math
         updateLiveOfficeView();
 
         const verdictEl = document.getElementById('deal-verdict');
@@ -276,20 +275,30 @@
 
     async function executeSync(method) {
         closeModal();
+
+        // UPGRADE: CHAMELEON PRICE LOGIC
+        const finalBidVal = parseVal('final_bid');
+        const purchasePrice = (finalBidVal > 0) ? finalBidVal.toLocaleString() : (baseDebtRelo + 10000 + (floorGrossFee > 10000 ? (floorGrossFee-10000)*0.7 : 0)).toLocaleString();
+
+        // UPGRADE: CLEAN DATE LOGIC
+        const now = new Date();
+        const cleanDate = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
         const data = {
             partner: currentUser,
             seller_name: document.getElementById('seller_name').value,
             address: document.getElementById('address').value,
             document_type: currentSyncMode, 
             signing_method: method, 
-            final_bid_price: document.getElementById('final_bid').value || "N/A (Using Floor)",
+            purchase_price: purchasePrice, 
             total_seller_net: document.getElementById('res-total').innerText,
+            agreement_date: cleanDate,
             lender_name: document.getElementById('lender_name').value,
             loan_number: document.getElementById('loan_number').value,
             partner_share: document.getElementById('off-partner-display').innerText,
             seller_bonus: document.getElementById('off-bonus-display').innerText,
             lead_color: leadColor,
-            timestamp: new Date().toLocaleString()
+            timestamp: now.toLocaleString()
         };
         
         try {
