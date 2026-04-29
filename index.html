@@ -174,7 +174,7 @@
 
 <script>
     let activeCounterId = null;
-    let leadColor = "Standard";
+    let leadColor = ""; // REMOVED "Standard" - Sending blank to let Sheet formula take over
     let currentUser = "";
     let baseDebtRelo = 0; 
     let floorGrossFee = 0; 
@@ -325,7 +325,7 @@
             auction_actual: document.getElementById('auction-date').value,
             partner_share: document.getElementById('off-partner-display').innerText,
             seller_bonus: document.getElementById('off-bonus-display').innerText,
-            lead_color: leadColor,
+            lead_color: leadColor, // This will now send as blank instead of "Standard"
             timestamp: today.toLocaleString()
         };
         
