@@ -83,11 +83,6 @@
         </div>
 
         <div class="field-box">
-            <label class="field-label">Seller Email Address</label>
-            <input type="email" id="seller_email" class="input-full" placeholder="seller@example.com">
-        </div>
-
-        <div class="field-box">
             <label class="field-label">Property Address</label>
             <input type="text" id="address" class="input-full" placeholder="Street, City, State">
         </div>
@@ -179,7 +174,7 @@
 
 <script>
     let activeCounterId = null;
-    let leadColor = ""; 
+    let leadColor = ""; // REMOVED "Standard" - Sending blank to let Sheet formula take over
     let currentUser = "";
     let baseDebtRelo = 0; 
     let floorGrossFee = 0; 
@@ -311,7 +306,6 @@
         const data = {
             partner: currentUser,
             seller_name: document.getElementById('seller_name').value,
-            seller_email: document.getElementById('seller_email').value,
             address: document.getElementById('address').value,
             document_type: currentSyncMode, 
             signing_method: method, 
@@ -331,7 +325,7 @@
             auction_actual: document.getElementById('auction-date').value,
             partner_share: document.getElementById('off-partner-display').innerText,
             seller_bonus: document.getElementById('off-bonus-display').innerText,
-            lead_color: leadColor,
+            lead_color: leadColor, // This will now send as blank instead of "Standard"
             timestamp: today.toLocaleString()
         };
         
