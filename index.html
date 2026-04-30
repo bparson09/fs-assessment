@@ -190,7 +190,8 @@
         if(!currentUser) return alert("Please select a partner.");
         document.getElementById('gatekeeper').style.display = 'none';
         document.getElementById('main_app').style.display = 'block';
-        if(currentUser === "Admin") document.getElementById('toggle-office-btn').style.display = 'block';
+        // Now enabled for everyone
+        document.getElementById('toggle-office-btn').style.display = 'block';
     }
 
     function formatCurrency(input) { let n = input.value.replace(/\D/g, ""); input.value = n === "" ? "" : Number(n).toLocaleString(); }
