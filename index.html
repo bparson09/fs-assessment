@@ -39,6 +39,7 @@
         .btn-action-master { width: 100%; padding: 18px; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         .btn-run { background: var(--main-teal); margin-top: 20px; }
         .btn-addendum { background: var(--action-orange); display: none; margin-top: 10px; }
+        .btn-refresh { background: none; border: 2px solid var(--main-teal); color: var(--main-teal); margin-top: 20px; padding: 12px; font-size: 0.8rem; }
         .results-area { display: none; margin-top: 15px; }
         .summary-card { background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #edf2f7; }
         .summary-line { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; }
@@ -174,6 +175,9 @@
             </div>
             <button id="sync-btn" class="btn-action-master" style="background:var(--action-red);" onclick="prepareSync('PACKET_A')">GENERATE PACKET A</button>
         </div>
+
+        <!-- NEW REFRESH BUTTON -->
+        <button class="btn-action-master btn-refresh" onclick="refreshTool()">🔄 RESET ASSESSMENT TOOL</button>
     </div>
 </div>
 
@@ -184,7 +188,7 @@
     let baseDebtRelo = 0; 
     let floorGrossFee = 0; 
     let currentSyncMode = "";
-    let floorPrice = 0; // Added global variable to track floor price
+    let floorPrice = 0;
 
     function unlockMachine() {
         currentUser = document.getElementById('user_identity').value;
@@ -192,6 +196,13 @@
         document.getElementById('gatekeeper').style.display = 'none';
         document.getElementById('main_app').style.display = 'block';
         document.getElementById('toggle-office-btn').style.display = 'block';
+    }
+
+    // Refresh function
+    function refreshTool() {
+        if(confirm("Are you sure you want to clear all data and reset?")) {
+            location.reload();
+        }
     }
 
     function formatCurrency(input) { let n = input.value.replace(/\D/g, ""); input.value = n === "" ? "" : Number(n).toLocaleString(); }
@@ -252,7 +263,7 @@
         const reloBase = parseVal('relo');
         
         baseDebtRelo = debt + reloBase;
-        floorPrice = (arv * 0.70) - repairs; // Update global floor price
+        floorPrice = (arv * 0.70) - repairs; 
         floorGrossFee = floorPrice - baseDebtRelo;
 
         document.getElementById('results').style.display = "block";
@@ -324,7 +335,7 @@
             document_type: currentSyncMode, 
             signing_method: method, 
             arv: arvVal,
-            bid_reference_price: (finalBidVal > 0) ? finalBidVal.toLocaleString() : floorPrice.toLocaleString(), // Logic fix: Show Floor if no bid
+            bid_reference_price: (finalBidVal > 0) ? finalBidVal.toLocaleString() : floorPrice.toLocaleString(),
             gross_firm_fee: floorGrossFee.toLocaleString(),
             verdict: verdictText,
             purchase_price: purchasePrice, 
@@ -333,7 +344,7 @@
             loan_number: document.getElementById('loan_number').value,
             debt_total: debtTotalVal.toLocaleString(), 
             relo_benefit: reloVal,
-            total_repairs: repairsTotal.toLocaleString(), // Added Repairs for Column S
+            total_repairs: repairsTotal.toLocaleString(),
             occupancy_days: moveWindow,
             agreement_date: agreementDateNum,
             closing_date: closingDateNum,
