@@ -198,10 +198,41 @@
         document.getElementById('toggle-office-btn').style.display = 'block';
     }
 
-    // Refresh function
+    // UPGRADED REFRESH FUNCTION: Clears data without kicking you out
     function refreshTool() {
         if(confirm("Are you sure you want to clear all data and reset?")) {
-            location.reload();
+            // 1. Clear all text and currency inputs
+            const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="date"]');
+            inputs.forEach(input => input.value = "");
+
+            // 2. Reset Relo Benefit to standard $2,000
+            document.getElementById('relo').value = "2,000";
+
+            // 3. Reset all dropdowns (except Partner Login)
+            const selects = document.querySelectorAll('select');
+            selects.forEach(select => {
+                if (select.id !== "user_identity") {
+                    select.selectedIndex = 0;
+                }
+            });
+
+            // 4. Reset photo counters to 0
+            const counters = document.querySelectorAll('.photo-count');
+            counters.forEach(span => span.innerText = "0");
+
+            // 5. Hide results and auction status banners
+            document.getElementById('results').style.display = "none";
+            document.getElementById('auction-status').style.display = "none";
+            document.getElementById('office-view').style.display = "none";
+            
+            // 6. Reset global logic variables
+            leadColor = "";
+            baseDebtRelo = 0;
+            floorGrossFee = 0;
+            floorPrice = 0;
+
+            window.scrollTo(0, 0);
+            alert("Tool Reset. Ready for the next assessment.");
         }
     }
 
@@ -359,7 +390,7 @@
         try {
             await fetch('https://hooks.zapier.com/hooks/catch/27133148/ujl6lys/', { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
             alert("✅ " + currentSyncMode + " Synced via " + method);
-            if(currentSyncMode === "PACKET_A") location.reload();
+            if(currentSyncMode === "PACKET_A") refreshTool(); // Automatically clear after a contract sync
         } catch (e) { alert("⚠️ Sync failed."); }
     }
 </script>
