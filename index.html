@@ -244,7 +244,6 @@
         document.getElementById('off-bonus-display').innerText = "$" + Math.round(bonus).toLocaleString();
     }
 
-    // UPDATED FUNCTION: Fixed floor to 8k and added button toggle
     function runAssessment() {
         const arv = parseVal('arv');
         const debt = parseVal('mortgage') + parseVal('arrears');
@@ -323,6 +322,7 @@
             document_type: currentSyncMode, 
             signing_method: method, 
             arv: arvVal,
+            bid_reference_price: finalBidVal.toLocaleString(), // THE UPGRADE
             gross_firm_fee: floorGrossFee.toLocaleString(),
             verdict: verdictText,
             purchase_price: purchasePrice, 
