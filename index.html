@@ -190,7 +190,6 @@
         if(!currentUser) return alert("Please select a partner.");
         document.getElementById('gatekeeper').style.display = 'none';
         document.getElementById('main_app').style.display = 'block';
-        // Now enabled for everyone
         document.getElementById('toggle-office-btn').style.display = 'block';
     }
 
@@ -245,6 +244,7 @@
         document.getElementById('off-bonus-display').innerText = "$" + Math.round(bonus).toLocaleString();
     }
 
+    // UPDATED FUNCTION: Fixed floor to 8k and added button toggle
     function runAssessment() {
         const arv = parseVal('arv');
         const debt = parseVal('mortgage') + parseVal('arrears');
@@ -263,12 +263,18 @@
         updateLiveOfficeView();
 
         const verdictEl = document.getElementById('deal-verdict');
-        if(floorGrossFee < 10000) {
+        const syncBtn = document.getElementById('sync-btn');
+
+        if(floorGrossFee < 8000) {
             verdictEl.innerText = "REVIEW REQUIRED";
             verdictEl.style.color = "#64748b";
+            syncBtn.innerText = "SEND FOR REVIEW";
+            syncBtn.style.backgroundColor = "var(--grey-review)";
         } else {
             verdictEl.innerText = "APPROVED";
             verdictEl.style.color = "green";
+            syncBtn.innerText = "GENERATE PACKET A";
+            syncBtn.style.backgroundColor = "var(--action-red)";
         }
     }
 
