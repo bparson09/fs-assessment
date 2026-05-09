@@ -366,6 +366,10 @@
             document_type: currentSyncMode, 
             signing_method: method, 
             arv: arvVal,
+            // START UPGRADE: Individual Debt Hooks
+            mortgage_payoff: mortgageVal.toLocaleString(),
+            total_arrears: arrearsVal.toLocaleString(),
+            // END UPGRADE
             bid_reference_price: (finalBidVal > 0) ? finalBidVal.toLocaleString() : floorPrice.toLocaleString(),
             gross_firm_fee: floorGrossFee.toLocaleString(),
             verdict: verdictText,
