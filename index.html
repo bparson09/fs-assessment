@@ -176,7 +176,6 @@
             <button id="sync-btn" class="btn-action-master" style="background:var(--action-red);" onclick="prepareSync('PACKET_A')">GENERATE PACKET A</button>
         </div>
 
-        <!-- NEW REFRESH BUTTON -->
         <button class="btn-action-master btn-refresh" onclick="refreshTool()">🔄 RESET ASSESSMENT TOOL</button>
     </div>
 </div>
@@ -365,11 +364,11 @@
             address: document.getElementById('address').value,
             document_type: currentSyncMode, 
             signing_method: method, 
+            // SIGNAL UPGRADE
+            button_action: (currentSyncMode === 'ADDENDUM') ? 'PRICE_ADJUSTMENT' : 'INTAKE_PACKET',
             arv: arvVal,
-            // START UPGRADE: Individual Debt Hooks
             mortgage_payoff: mortgageVal.toLocaleString(),
             total_arrears: arrearsVal.toLocaleString(),
-            // END UPGRADE
             bid_reference_price: (finalBidVal > 0) ? finalBidVal.toLocaleString() : floorPrice.toLocaleString(),
             gross_firm_fee: floorGrossFee.toLocaleString(),
             verdict: verdictText,
@@ -394,7 +393,7 @@
         try {
             await fetch('https://hooks.zapier.com/hooks/catch/27133148/ujl6lys/', { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
             alert("✅ " + currentSyncMode + " Synced via " + method);
-            if(currentSyncMode === "PACKET_A") refreshTool(); // Automatically clear after a contract sync
+            if(currentSyncMode === "PACKET_A") refreshTool(); 
         } catch (e) { alert("⚠️ Sync failed."); }
     }
 </script>
