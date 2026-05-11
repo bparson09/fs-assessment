@@ -197,39 +197,24 @@
         document.getElementById('toggle-office-btn').style.display = 'block';
     }
 
-    // UPGRADED REFRESH FUNCTION: Clears data without kicking you out
     function refreshTool() {
         if(confirm("Are you sure you want to clear all data and reset?")) {
-            // 1. Clear all text and currency inputs
             const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="date"]');
             inputs.forEach(input => input.value = "");
-
-            // 2. Reset Relo Benefit to standard $2,000
             document.getElementById('relo').value = "2,000";
-
-            // 3. Reset all dropdowns (except Partner Login)
             const selects = document.querySelectorAll('select');
             selects.forEach(select => {
-                if (select.id !== "user_identity") {
-                    select.selectedIndex = 0;
-                }
+                if (select.id !== "user_identity") select.selectedIndex = 0;
             });
-
-            // 4. Reset photo counters to 0
             const counters = document.querySelectorAll('.photo-count');
             counters.forEach(span => span.innerText = "0");
-
-            // 5. Hide results and auction status banners
             document.getElementById('results').style.display = "none";
             document.getElementById('auction-status').style.display = "none";
             document.getElementById('office-view').style.display = "none";
-            
-            // 6. Reset global logic variables
             leadColor = "";
             baseDebtRelo = 0;
             floorGrossFee = 0;
             floorPrice = 0;
-
             window.scrollTo(0, 0);
             alert("Tool Reset. Ready for the next assessment.");
         }
@@ -265,7 +250,6 @@
         const btn = document.getElementById('btn-addendum');
         const partnerLabel = document.getElementById('label-partner');
         const bonusLabel = document.getElementById('label-bonus');
-        
         let targetGross = (finalBid > 0) ? (finalBid - baseDebtRelo) : floorGrossFee;
 
         if (finalBid > 0) {
@@ -281,7 +265,6 @@
         let bonus = (targetGross > 10000) ? (targetGross - 10000) * 0.30 : 0;
         if(bonus > 15000) bonus = 15000; 
         const partnerShare = (targetGross > 0) ? targetGross * 0.225 : 0;
-
         document.getElementById('off-partner-display').innerText = "$" + Math.round(partnerShare).toLocaleString();
         document.getElementById('off-bonus-display').innerText = "$" + Math.round(bonus).toLocaleString();
     }
@@ -291,21 +274,16 @@
         const debt = parseVal('mortgage') + parseVal('arrears');
         const repairs = (parseFloat(document.getElementById('roof').value) || 0) + (parseFloat(document.getElementById('hvac').value) || 0) + (parseFloat(document.getElementById('kitchen').value) || 0) + (parseFloat(document.getElementById('trash').value) || 0);
         const reloBase = parseVal('relo');
-        
         baseDebtRelo = debt + reloBase;
         floorPrice = (arv * 0.70) - repairs; 
         floorGrossFee = floorPrice - baseDebtRelo;
-
         document.getElementById('results').style.display = "block";
         document.getElementById('res-debt').innerText = "$" + debt.toLocaleString();
         document.getElementById('res-relo').innerText = "$" + reloBase.toLocaleString();
         document.getElementById('res-total').innerText = "$" + (baseDebtRelo).toLocaleString();
-        
         updateLiveOfficeView();
-
         const verdictEl = document.getElementById('deal-verdict');
         const syncBtn = document.getElementById('sync-btn');
-
         if(floorGrossFee < 8000) {
             verdictEl.innerText = "REVIEW REQUIRED";
             verdictEl.style.color = "#64748b";
@@ -335,12 +313,11 @@
 
     async function executeSync(method) {
         closeModal();
-
         const finalBidVal = parseVal('final_bid');
         const mortgageVal = parseVal('mortgage');
         const arrearsVal = parseVal('arrears');
         const debtTotalVal = mortgageVal + arrearsVal;
-        const reloVal = document.getElementById('relo').value;
+        const reloValStr = document.getElementById('relo').value;
         const moveWindow = document.getElementById('move-window').value;
         const arvVal = document.getElementById('arv').value;
         const verdictText = document.getElementById('deal-verdict').innerText;
@@ -357,6 +334,10 @@
 
         const purchasePrice = (finalBidVal > 0) ? finalBidVal.toLocaleString() : (baseDebtRelo + 10000 + (floorGrossFee > 10000 ? (floorGrossFee-10000)*0.7 : 0)).toLocaleString();
 
+        // --- THE "MACHINE" RAW UPGRADE ---
+        const sellerNetRaw = document.getElementById('res-total').innerText.replace(/\D/g, "");
+        const bidPriceRaw = (finalBidVal > 0) ? finalBidVal : floorPrice;
+
         const data = {
             partner: currentUser,
             seller_name: document.getElementById('seller_name').value,
@@ -364,20 +345,26 @@
             address: document.getElementById('address').value,
             document_type: currentSyncMode, 
             signing_method: method, 
-            // SIGNAL UPGRADE
             button_action: (currentSyncMode === 'ADDENDUM') ? 'PRICE_ADJUSTMENT' : 'INTAKE_PACKET',
             arv: arvVal,
             mortgage_payoff: mortgageVal.toLocaleString(),
             total_arrears: arrearsVal.toLocaleString(),
+            
+            // MATH FIELDS (RAW - USE THESE FOR STEP 17)
+            bid_reference_raw: bidPriceRaw,
+            total_seller_net_raw: sellerNetRaw,
+
+            // DISPLAY FIELDS (STILL USED FOR CONTRACTS)
             bid_reference_price: (finalBidVal > 0) ? finalBidVal.toLocaleString() : floorPrice.toLocaleString(),
+            total_seller_net: document.getElementById('res-total').innerText,
+            
             gross_firm_fee: floorGrossFee.toLocaleString(),
             verdict: verdictText,
             purchase_price: purchasePrice, 
-            total_seller_net: document.getElementById('res-total').innerText,
             lender_name: document.getElementById('lender_name').value,
             loan_number: document.getElementById('loan_number').value,
             debt_total: debtTotalVal.toLocaleString(), 
-            relo_benefit: reloVal,
+            relo_benefit: reloValStr,
             total_repairs: repairsTotal.toLocaleString(),
             occupancy_days: moveWindow,
             agreement_date: agreementDateNum,
