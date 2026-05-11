@@ -356,7 +356,8 @@
 
             // DISPLAY FIELDS (STILL USED FOR CONTRACTS)
             bid_reference_price: (finalBidVal > 0) ? finalBidVal.toLocaleString() : floorPrice.toLocaleString(),
-            total_seller_net: document.getElementById('res-total').innerText,
+            // CRITICAL FIX: Strip the "$" from total_seller_net so it mirrors debt_total in Zapier
+            total_seller_net: document.getElementById('res-total').innerText.replace('$', ''),
             
             gross_firm_fee: floorGrossFee.toLocaleString(),
             verdict: verdictText,
