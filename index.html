@@ -152,10 +152,10 @@
             <div id="deal-verdict" style="text-align:center; font-weight:bold; margin-bottom:10px; font-size: 1.1rem;"></div>
             
             <div id="office-view" class="office-view">
-                <span class="field-label" id="label-partner" style="color:#92400e; text-transform: uppercase;">Est. Partner Share</span>
+                <span class="field-label" id="label-partner" style="color:#92400e; text-transform: uppercase;">YOUR ESTIMATED SHARE</span>
                 <div id="off-partner-display" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">$0</div>
 
-                <span class="field-label" id="label-bonus" style="color:#92400e; text-transform: uppercase;">Est. Seller Bonus (Capped $15k)</span>
+                <span class="field-label" id="label-bonus" style="color:#92400e; text-transform: uppercase;">LIVE SELLER BONUS (30%)</span>
                 <div id="off-bonus-display" style="font-size:1.1rem; font-weight:bold; color:var(--safe-green); margin-bottom:10px;">$0</div>
 
                 <div class="field-box">
@@ -188,6 +188,7 @@
     let floorGrossFee = 0; 
     let currentSyncMode = "";
     let floorPrice = 0;
+    window.currentFirmFee = 0; // Added to store the 70% share for Zapier
 
     function unlockMachine() {
         currentUser = document.getElementById('user_identity').value;
@@ -215,6 +216,7 @@
             baseDebtRelo = 0;
             floorGrossFee = 0;
             floorPrice = 0;
+            window.currentFirmFee = 0;
             window.scrollTo(0, 0);
             alert("Tool Reset. Ready for the next assessment.");
         }
@@ -248,25 +250,29 @@
     function updateLiveOfficeView() {
         const finalBid = parseVal('final_bid');
         const btn = document.getElementById('btn-addendum');
-        const partnerLabel = document.getElementById('label-partner');
-        const bonusLabel = document.getElementById('label-bonus');
-        let targetGross = (finalBid > 0) ? (finalBid - baseDebtRelo) : floorGrossFee;
+        
+        // 1. Calculate Spread
+        let spread = (finalBid > 0) ? (finalBid - baseDebtRelo) : floorGrossFee;
+        let totalProfit = (spread > 0) ? spread : 0;
+
+        // 2. The 70/30 Rule (Firm vs Seller)
+        let firmGross = totalProfit * 0.70;
+        let sellerBonus = totalProfit * 0.30;
+
+        // 3. The Rosie Rule (22.5% of the Firm's 70%)
+        let rosieTakeHome = firmGross * 0.225;
+
+        // Store Firm Fee for hidden Master Chart Sync
+        window.currentFirmFee = Math.round(firmGross);
 
         if (finalBid > 0) {
             btn.style.display = "block";
-            partnerLabel.innerText = "Live Partner Share";
-            bonusLabel.innerText = "Live Seller Bonus (Capped $15k)";
         } else {
             btn.style.display = "none";
-            partnerLabel.innerText = "Est. Partner Share";
-            bonusLabel.innerText = "Est. Seller Bonus (Capped $15k)";
         }
 
-        let bonus = (targetGross > 10000) ? (targetGross - 10000) * 0.30 : 0;
-        if(bonus > 15000) bonus = 15000; 
-        const partnerShare = (targetGross > 0) ? targetGross * 0.225 : 0;
-        document.getElementById('off-partner-display').innerText = "$" + Math.round(partnerShare).toLocaleString();
-        document.getElementById('off-bonus-display').innerText = "$" + Math.round(bonus).toLocaleString();
+        document.getElementById('off-partner-display').innerText = "$" + Math.round(rosieTakeHome).toLocaleString();
+        document.getElementById('off-bonus-display').innerText = "$" + Math.round(sellerBonus).toLocaleString();
     }
 
     function runAssessment() {
@@ -334,7 +340,6 @@
 
         const purchasePrice = (finalBidVal > 0) ? finalBidVal.toLocaleString() : (baseDebtRelo + 10000 + (floorGrossFee > 10000 ? (floorGrossFee-10000)*0.7 : 0)).toLocaleString();
 
-        // --- THE "MACHINE" RAW UPGRADE ---
         const sellerNetRaw = document.getElementById('res-total').innerText.replace(/\D/g, "");
         const bidPriceRaw = (finalBidVal > 0) ? finalBidVal : floorPrice;
 
@@ -350,16 +355,14 @@
             mortgage_payoff: mortgageVal.toLocaleString(),
             total_arrears: arrearsVal.toLocaleString(),
             
-            // MATH FIELDS (RAW - USE THESE FOR STEP 17)
             bid_reference_raw: bidPriceRaw,
             total_seller_net_raw: sellerNetRaw,
-
-            // DISPLAY FIELDS (STILL USED FOR CONTRACTS)
             bid_reference_price: (finalBidVal > 0) ? finalBidVal.toLocaleString() : floorPrice.toLocaleString(),
-            // CRITICAL FIX: Strip the "$" from total_seller_net so it mirrors debt_total in Zapier
             total_seller_net: document.getElementById('res-total').innerText.replace('$', ''),
             
-            gross_firm_fee: floorGrossFee.toLocaleString(),
+            // SYNCING THE CORRECT 70% FIRM FEE HERE
+            gross_firm_fee: window.currentFirmFee.toLocaleString(),
+            
             verdict: verdictText,
             purchase_price: purchasePrice, 
             lender_name: document.getElementById('lender_name').value,
