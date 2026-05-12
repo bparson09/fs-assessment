@@ -188,7 +188,7 @@
     let floorGrossFee = 0; 
     let currentSyncMode = "";
     let floorPrice = 0;
-    window.currentFirmFee = 0; // Added to store the 70% share for Zapier
+    window.currentFirmFee = 0;
 
     function unlockMachine() {
         currentUser = document.getElementById('user_identity').value;
@@ -251,18 +251,13 @@
         const finalBid = parseVal('final_bid');
         const btn = document.getElementById('btn-addendum');
         
-        // 1. Calculate Spread
         let spread = (finalBid > 0) ? (finalBid - baseDebtRelo) : floorGrossFee;
         let totalProfit = (spread > 0) ? spread : 0;
 
-        // 2. The 70/30 Rule (Firm vs Seller)
         let firmGross = totalProfit * 0.70;
         let sellerBonus = totalProfit * 0.30;
-
-        // 3. The Rosie Rule (22.5% of the Firm's 70%)
         let rosieTakeHome = firmGross * 0.225;
 
-        // Store Firm Fee for hidden Master Chart Sync
         window.currentFirmFee = Math.round(firmGross);
 
         if (finalBid > 0) {
@@ -338,10 +333,21 @@
         powerHourObj.setDate(closingObj.getDate() - 8);
         const powerHourNum = formatNumericDate(powerHourObj);
 
-        const purchasePrice = (finalBidVal > 0) ? finalBidVal.toLocaleString() : (baseDebtRelo + 10000 + (floorGrossFee > 10000 ? (floorGrossFee-10000)*0.7 : 0)).toLocaleString();
-
-        const sellerNetRaw = document.getElementById('res-total').innerText.replace(/\D/g, "");
-        const bidPriceRaw = (finalBidVal > 0) ? finalBidVal : floorPrice;
+        // SYNC MATH: Clean unformatted numbers for Zapier automation
+        let calcPurchasePrice = 0;
+        let currentSellerBonus = 0;
+        let currentPartnerShare = 0;
+        
+        if (finalBidVal > 0) {
+            let currentSpread = finalBidVal - baseDebtRelo;
+            currentSellerBonus = Math.round(currentSpread * 0.30);
+            calcPurchasePrice = baseDebtRelo + currentSellerBonus;
+            currentPartnerShare = Math.round((currentSpread * 0.70) * 0.225);
+        } else {
+            // Default floor behavior
+            calcPurchasePrice = baseDebtRelo + 10000;
+            currentPartnerShare = 0; 
+        }
 
         const data = {
             partner: currentUser,
@@ -351,32 +357,26 @@
             document_type: currentSyncMode, 
             signing_method: method, 
             button_action: (currentSyncMode === 'ADDENDUM') ? 'PRICE_ADJUSTMENT' : 'INTAKE_PACKET',
-            arv: arvVal,
-            mortgage_payoff: mortgageVal.toLocaleString(),
-            total_arrears: arrearsVal.toLocaleString(),
-            
-            bid_reference_raw: bidPriceRaw,
-            total_seller_net_raw: sellerNetRaw,
-            bid_reference_price: (finalBidVal > 0) ? finalBidVal.toLocaleString() : floorPrice.toLocaleString(),
-            total_seller_net: document.getElementById('res-total').innerText.replace('$', ''),
-            
-            // SYNCING THE CORRECT 70% FIRM FEE HERE
-            gross_firm_fee: window.currentFirmFee.toLocaleString(),
-            
+            arv: arvVal.replace(/\D/g, ""),
+            mortgage_payoff: mortgageVal,
+            total_arrears: arrearsVal,
+            bid_reference_price: (finalBidVal > 0) ? finalBidVal : Math.round(floorPrice),
+            total_seller_net: baseDebtRelo,
+            gross_firm_fee: window.currentFirmFee,
             verdict: verdictText,
-            purchase_price: purchasePrice, 
+            purchase_price: Math.round(calcPurchasePrice), 
             lender_name: document.getElementById('lender_name').value,
             loan_number: document.getElementById('loan_number').value,
-            debt_total: debtTotalVal.toLocaleString(), 
-            relo_benefit: reloValStr,
-            total_repairs: repairsTotal.toLocaleString(),
+            debt_total: debtTotalVal, 
+            relo_benefit: reloValStr.replace(/\D/g, ""),
+            total_repairs: repairsTotal,
             occupancy_days: moveWindow,
             agreement_date: agreementDateNum,
             closing_date: closingDateNum,
             power_hour_date: powerHourNum,
             auction_actual: document.getElementById('auction-date').value,
-            partner_share: document.getElementById('off-partner-display').innerText,
-            seller_bonus: document.getElementById('off-bonus-display').innerText,
+            partner_share: currentPartnerShare,
+            seller_bonus: currentSellerBonus,
             lead_color: leadColor,
             timestamp: today.toLocaleString()
         };
