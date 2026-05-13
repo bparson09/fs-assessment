@@ -366,7 +366,7 @@
             mortgage_payoff: mortgageVal.toLocaleString(),
             total_arrears: arrearsVal.toLocaleString(),
             bid_reference_price: (finalBidVal > 0) ? finalBidVal.toLocaleString() : Math.round(floorPrice).toLocaleString(),
-            total_seller_net: "$" + sellerNetBase.toLocaleString(), // ADDED $ SIGN HERE
+            total_seller_net: sellerNetBase.toLocaleString(), // FIX: Removed "$" to prevent SignNow RegEx errors
             gross_firm_fee: window.currentFirmFee.toLocaleString(),
             verdict: verdictText,
             purchase_price: Math.round(calcPurchasePrice).toLocaleString(), 
