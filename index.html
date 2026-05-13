@@ -256,8 +256,6 @@
 
         let firmGross = totalProfit * 0.70;
         let sellerBonus = totalProfit * 0.30;
-        
-        // Math updated: Partner share is 22.5% of the TOTAL profit pool
         let partnerTakeHome = totalProfit * 0.225;
 
         window.currentFirmFee = Math.round(firmGross);
@@ -340,18 +338,19 @@
         let currentSellerBonus = 0;
         let currentPartnerShare = 0;
         let baseReloNum = parseFloat(reloValStr.replace(/\D/g, "")) || 0;
+        let sellerNetBase = debtTotalVal + baseReloNum; // Guaranteed Seller Total (e.g. 87,400)
         
-        let spread = (finalBidVal > 0) ? (finalBidVal - baseDebtRelo) : floorGrossFee;
+        let spread = (finalBidVal > 0) ? (finalBidVal - sellerNetBase) : floorGrossFee;
         let totalProfit = (spread > 0) ? spread : 0;
         
         currentSellerBonus = Math.round(totalProfit * 0.30);
-        // Sync Math updated to match the 22.5% display target
         currentPartnerShare = Math.round(totalProfit * 0.225);
 
+        // Logic Sync: If bid exists, Purchase Price = Net + Bonus. Else, standard Net + 10k spread.
         if (finalBidVal > 0) {
-            calcPurchasePrice = baseDebtRelo + currentSellerBonus;
+            calcPurchasePrice = sellerNetBase + currentSellerBonus;
         } else {
-            calcPurchasePrice = baseDebtRelo + 10000;
+            calcPurchasePrice = sellerNetBase + 10000;
         }
 
         let totalReloCombinedVal = baseReloNum + currentSellerBonus;
@@ -364,27 +363,27 @@
             document_type: currentSyncMode, 
             signing_method: method, 
             button_action: (currentSyncMode === 'ADDENDUM') ? 'PRICE_ADJUSTMENT' : 'INTAKE_PACKET',
-            arv: arvVal.replace(/\D/g, ""),
-            mortgage_payoff: mortgageVal,
-            total_arrears: arrearsVal,
-            bid_reference_price: (finalBidVal > 0) ? finalBidVal : Math.round(floorPrice),
-            total_seller_net: baseDebtRelo,
-            gross_firm_fee: window.currentFirmFee,
+            arv: parseFloat(arvVal.replace(/\D/g, "")).toLocaleString(),
+            mortgage_payoff: mortgageVal.toLocaleString(),
+            total_arrears: arrearsVal.toLocaleString(),
+            bid_reference_price: (finalBidVal > 0) ? finalBidVal.toLocaleString() : Math.round(floorPrice).toLocaleString(),
+            total_seller_net: sellerNetBase.toLocaleString(),
+            gross_firm_fee: window.currentFirmFee.toLocaleString(),
             verdict: verdictText,
-            purchase_price: Math.round(calcPurchasePrice), 
+            purchase_price: Math.round(calcPurchasePrice).toLocaleString(), 
             lender_name: document.getElementById('lender_name').value,
             loan_number: document.getElementById('loan_number').value,
-            debt_total: debtTotalVal, 
-            relo_benefit: baseReloNum,
-            total_relo_combined: totalReloCombinedVal,
-            total_repairs: repairsTotal,
+            debt_total: debtTotalVal.toLocaleString(), 
+            relo_benefit: baseReloNum.toLocaleString(),
+            total_relo_combined: totalReloCombinedVal.toLocaleString(),
+            total_repairs: repairsTotal.toLocaleString(),
             occupancy_days: moveWindow,
             agreement_date: agreementDateNum,
             closing_date: closingDateNum,
             power_hour_date: powerHourNum,
             auction_actual: document.getElementById('auction-date').value,
-            partner_share: currentPartnerShare,
-            seller_bonus: currentSellerBonus,
+            partner_share: currentPartnerShare.toLocaleString(),
+            seller_bonus: currentSellerBonus.toLocaleString(),
             lead_color: leadColor,
             timestamp: today.toLocaleString()
         };
