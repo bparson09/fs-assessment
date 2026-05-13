@@ -337,6 +337,7 @@
         let calcPurchasePrice = 0;
         let currentSellerBonus = 0;
         let currentPartnerShare = 0;
+        let baseReloNum = parseFloat(reloValStr.replace(/\D/g, "")) || 0;
         
         if (finalBidVal > 0) {
             let currentSpread = finalBidVal - baseDebtRelo;
@@ -348,6 +349,9 @@
             calcPurchasePrice = baseDebtRelo + 10000;
             currentPartnerShare = 0; 
         }
+
+        // NEW CALCULATION: Combined Relocation + Seller Bonus
+        let totalReloCombinedVal = baseReloNum + currentSellerBonus;
 
         const data = {
             partner: currentUser,
@@ -368,7 +372,8 @@
             lender_name: document.getElementById('lender_name').value,
             loan_number: document.getElementById('loan_number').value,
             debt_total: debtTotalVal, 
-            relo_benefit: reloValStr.replace(/\D/g, ""),
+            relo_benefit: baseReloNum,
+            total_relo_combined: totalReloCombinedVal,
             total_repairs: repairsTotal,
             occupancy_days: moveWindow,
             agreement_date: agreementDateNum,
