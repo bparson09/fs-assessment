@@ -152,7 +152,7 @@
             <div id="deal-verdict" style="text-align:center; font-weight:bold; margin-bottom:10px; font-size: 1.1rem;"></div>
             
             <div id="office-view" class="office-view">
-                <span class="field-label" id="label-partner" style="color:#92400e; text-transform: uppercase;">YOUR ESTIMATED SHARE</span>
+                <span class="field-label" id="label-partner" style="color:#92400e; text-transform: uppercase;">EST PARTNER SHARE</span>
                 <div id="off-partner-display" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">$0</div>
 
                 <span class="field-label" id="label-bonus" style="color:#92400e; text-transform: uppercase;">LIVE SELLER BONUS (30%)</span>
@@ -256,7 +256,9 @@
 
         let firmGross = totalProfit * 0.70;
         let sellerBonus = totalProfit * 0.30;
-        let rosieTakeHome = firmGross * 0.225;
+        
+        // Math updated: Partner share is 22.5% of the TOTAL profit pool
+        let partnerTakeHome = totalProfit * 0.225;
 
         window.currentFirmFee = Math.round(firmGross);
 
@@ -266,7 +268,7 @@
             btn.style.display = "none";
         }
 
-        document.getElementById('off-partner-display').innerText = "$" + Math.round(rosieTakeHome).toLocaleString();
+        document.getElementById('off-partner-display').innerText = "$" + Math.round(partnerTakeHome).toLocaleString();
         document.getElementById('off-bonus-display').innerText = "$" + Math.round(sellerBonus).toLocaleString();
     }
 
@@ -286,7 +288,6 @@
         const verdictEl = document.getElementById('deal-verdict');
         const syncBtn = document.getElementById('sync-btn');
         
-        // Threshold check for 9k minimum firm fee (based on gross fee before 70/30 split logic)
         if(floorGrossFee < 9000) {
             verdictEl.innerText = "REVIEW REQUIRED";
             verdictEl.style.color = "#64748b";
@@ -335,24 +336,24 @@
         powerHourObj.setDate(closingObj.getDate() - 8);
         const powerHourNum = formatNumericDate(powerHourObj);
 
-        // SYNC MATH: Clean unformatted numbers for Zapier automation
         let calcPurchasePrice = 0;
         let currentSellerBonus = 0;
         let currentPartnerShare = 0;
         let baseReloNum = parseFloat(reloValStr.replace(/\D/g, "")) || 0;
         
+        let spread = (finalBidVal > 0) ? (finalBidVal - baseDebtRelo) : floorGrossFee;
+        let totalProfit = (spread > 0) ? spread : 0;
+        
+        currentSellerBonus = Math.round(totalProfit * 0.30);
+        // Sync Math updated to match the 22.5% display target
+        currentPartnerShare = Math.round(totalProfit * 0.225);
+
         if (finalBidVal > 0) {
-            let currentSpread = finalBidVal - baseDebtRelo;
-            currentSellerBonus = Math.round(currentSpread * 0.30);
             calcPurchasePrice = baseDebtRelo + currentSellerBonus;
-            currentPartnerShare = Math.round((currentSpread * 0.70) * 0.225);
         } else {
-            // Default floor behavior
             calcPurchasePrice = baseDebtRelo + 10000;
-            currentPartnerShare = 0; 
         }
 
-        // NEW CALCULATION: Combined Relocation + Seller Bonus
         let totalReloCombinedVal = baseReloNum + currentSellerBonus;
 
         const data = {
