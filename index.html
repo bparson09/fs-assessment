@@ -338,7 +338,7 @@
         let currentSellerBonus = 0;
         let currentPartnerShare = 0;
         let baseReloNum = parseFloat(reloValStr.replace(/\D/g, "")) || 0;
-        let sellerNetBase = debtTotalVal + baseReloNum; // Guaranteed Seller Total (e.g. 87,400)
+        let sellerNetBase = debtTotalVal + baseReloNum; 
         
         let spread = (finalBidVal > 0) ? (finalBidVal - sellerNetBase) : floorGrossFee;
         let totalProfit = (spread > 0) ? spread : 0;
@@ -346,7 +346,6 @@
         currentSellerBonus = Math.round(totalProfit * 0.30);
         currentPartnerShare = Math.round(totalProfit * 0.225);
 
-        // Logic Sync: If bid exists, Purchase Price = Net + Bonus. Else, standard Net + 10k spread.
         if (finalBidVal > 0) {
             calcPurchasePrice = sellerNetBase + currentSellerBonus;
         } else {
@@ -367,7 +366,7 @@
             mortgage_payoff: mortgageVal.toLocaleString(),
             total_arrears: arrearsVal.toLocaleString(),
             bid_reference_price: (finalBidVal > 0) ? finalBidVal.toLocaleString() : Math.round(floorPrice).toLocaleString(),
-            total_seller_net: sellerNetBase.toLocaleString(),
+            total_seller_net: "$" + sellerNetBase.toLocaleString(), // ADDED $ SIGN HERE
             gross_firm_fee: window.currentFirmFee.toLocaleString(),
             verdict: verdictText,
             purchase_price: Math.round(calcPurchasePrice).toLocaleString(), 
