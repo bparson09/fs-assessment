@@ -251,8 +251,7 @@
         const finalBid = parseVal('final_bid');
         const btn = document.getElementById('btn-addendum');
         
-        // UPGRADE: Math correction to ensure full gross profit is captured
-        let spread = (finalBid > 0) ? (finalBid - baseDebtRelo) : floorGrossFee;
+        let spread = (finalBid > 0) ? (finalBid - baseDebtRelo) : (floorPrice - baseDebtRelo);
         let totalProfit = (spread > 0) ? spread : 0;
 
         let firmGross = totalProfit * 0.70;
@@ -280,8 +279,8 @@
         baseDebtRelo = debt + reloBase;
         floorPrice = (arv * 0.70) - repairs; 
         
-        // UPGRADE: Fixing logic floor to adhere to 9000 threshold
-        floorGrossFee = floorPrice - baseDebtRelo;
+        // UPGRADE: Verdict now checks TOTAL potential spread against the 9000 threshold
+        let totalPotentialSpread = floorPrice - baseDebtRelo;
         
         document.getElementById('results').style.display = "block";
         document.getElementById('res-debt').innerText = "$" + debt.toLocaleString();
@@ -292,14 +291,14 @@
         const verdictEl = document.getElementById('deal-verdict');
         const syncBtn = document.getElementById('sync-btn');
         
-        if(floorGrossFee < 9000) {
+        if(totalPotentialSpread < 9000) {
             verdictEl.innerText = "REVIEW REQUIRED";
-            verdictEl.style.color = "#64748b";
+            verdictEl.style.color = "#c0392b";
             syncBtn.innerText = "SEND FOR REVIEW";
             syncBtn.style.backgroundColor = "var(--grey-review)";
         } else {
             verdictEl.innerText = "APPROVED";
-            verdictEl.style.color = "green";
+            verdictEl.style.color = "#27ae60";
             syncBtn.innerText = "GENERATE PACKET A";
             syncBtn.style.backgroundColor = "var(--action-red)";
         }
@@ -346,7 +345,7 @@
         let baseReloNum = parseFloat(reloValStr.replace(/\D/g, "")) || 0;
         let sellerNetBase = debtTotalVal + baseReloNum; 
         
-        let spread = (finalBidVal > 0) ? (finalBidVal - sellerNetBase) : floorGrossFee;
+        let spread = (finalBidVal > 0) ? (finalBidVal - sellerNetBase) : (floorPrice - sellerNetBase);
         let totalProfit = (spread > 0) ? spread : 0;
         
         currentSellerBonus = Math.round(totalProfit * 0.30);
