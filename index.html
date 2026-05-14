@@ -162,7 +162,7 @@
                 <span class="field-label" id="label-closing-method" style="color:#b45309; font-weight: bold; text-transform: uppercase;">SUGGESTED CLOSING</span>
                 <div id="off-closing-method" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">-</div>
 
-                <span class="field-label" id="label-partner" style="color:#92400e; text-transform: uppercase;">EST PARTNER SHARE</span>
+                <span class="field-label" id="label-partner" style="color:#92400e; text-transform: uppercase;">EST PARTNER SHARE (22.5%)</span>
                 <div id="off-partner-display" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">$0</div>
 
                 <span class="field-label" id="label-bonus" style="color:#92400e; text-transform: uppercase;">LIVE SELLER BONUS (30%)</span>
@@ -272,7 +272,7 @@
 
     function toggleOffice() { var x = document.getElementById('office-view'); x.style.display = (x.style.display === 'block') ? 'none' : 'block'; }
 
-    // UPGRADED MATH: Partner Share is 22.5% of FIRM GROSS only.
+    // UPDATED MATH: Locked Partner Share to 22.5% of the calculated Firm's Gross Fee
     function updateLiveOfficeView() {
         const finalBid = parseVal('final_bid');
         const btn = document.getElementById('btn-addendum');
@@ -280,15 +280,17 @@
         let spread = (finalBid > 0) ? (finalBid - baseDebtRelo) : (floorPrice - baseDebtRelo);
         let totalProfit = (spread > 0) ? spread : 0;
 
+        // Apply 70/30 Profit Split
         let rawSellerBonus = totalProfit * 0.30;
-        let sellerBonus = Math.min(rawSellerBonus, 15000); 
+        let sellerBonus = Math.min(rawSellerBonus, 15000); // Capped at $15k
         let firmGross = totalProfit - sellerBonus; 
         
-        // UPGRADED RULE: Strictly 22.5% of the calculated Firm's Gross Fee
+        // UPGRADED RULE: Partner Share is 22.5% of Gross Firm Fee
         let partnerTakeHome = firmGross * 0.225;
 
         window.currentFirmFee = Math.round(firmGross);
 
+        // Toggle Closing Method: Double Close if fee > $15k
         suggestedClosing = (window.currentFirmFee > 15000) ? "Double Close" : "Assignment";
         document.getElementById('off-closing-method').innerText = suggestedClosing;
 
@@ -309,6 +311,7 @@
         const reloBase = parseVal('relo');
         
         baseDebtRelo = debt + reloBase;
+        // Apply 70% rule
         floorPrice = (arv * 0.70) - repairs; 
         
         let totalPotentialSpread = floorPrice - baseDebtRelo;
@@ -341,6 +344,7 @@
             if (!discDate) {
                 document.getElementById('disclosure-alert').style.display = 'block';
                 document.getElementById('disclosure-section').scrollIntoView({behavior: 'smooth'});
+                // Mandatory disclosure check for Green leads
                 return alert("Green leads require the 14-Day Disclosure Date before printing.");
             }
         }
