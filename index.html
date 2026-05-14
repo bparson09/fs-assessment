@@ -364,6 +364,9 @@
         const arvVal = document.getElementById('arv').value;
         const verdictText = document.getElementById('deal-verdict').innerText;
 
+        // UPGRADE: Calculate total repairs to send to Zapier
+        const totalRepairs = (parseFloat(document.getElementById('roof').value) || 0) + (parseFloat(document.getElementById('hvac').value) || 0) + (parseFloat(document.getElementById('kitchen').value) || 0) + (parseFloat(document.getElementById('trash').value) || 0);
+
         const today = new Date();
         const agreementDateNum = formatNumericDate(today);
         const closingObj = new Date();
@@ -415,6 +418,7 @@
             debt_total: debtTotalVal.toLocaleString(), 
             relo_benefit: baseReloNum.toLocaleString(),
             total_relo_combined: totalReloCombinedVal.toLocaleString(),
+            total_repairs: totalRepairs.toLocaleString(), // UPGRADED FIELD
             occupancy_days: moveWindow,
             agreement_date: agreementDateNum,
             closing_date: closingDateNum,
