@@ -60,7 +60,7 @@
 
 <div id="gatekeeper">
     <div class="login-box">
-        <img src="logo.png" onerror="this.src='logo.png.png'" alt="Fresh Start Solutions" class="app-logo">
+        <img src="logo.png" onerror="this.src='https://via.placeholder.com/320x80?text=Fresh+Start+Solutions'" alt="Fresh Start Solutions" class="app-logo">
         <select id="user_identity" class="login-input">
             <option value="">Select Partner...</option>
             <option value="Rosie Searcy">Rosie Searcy</option>
@@ -376,6 +376,7 @@
         let baseReloNum = parseFloat(reloValStr.replace(/\D/g, "")) || 0;
         let sellerNetBase = debtTotalVal + baseReloNum; 
         
+        // Ensure referencePrice is captured for column T
         const referencePrice = (finalBidVal > 0) ? finalBidVal : floorPrice;
         const totalSpread = (referencePrice > sellerNetBase) ? (referencePrice - sellerNetBase) : 0;
 
