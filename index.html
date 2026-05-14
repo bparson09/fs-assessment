@@ -279,11 +279,13 @@
         let spread = (finalBid > 0) ? (finalBid - baseDebtRelo) : (floorPrice - baseDebtRelo);
         let totalProfit = (spread > 0) ? spread : 0;
 
-        let firmGross = totalProfit * 0.70;
-        let sellerBonus = totalProfit * 0.30;
-        let partnerTakeHome = totalProfit * 0.225;
+        let rawSellerBonus = totalProfit * 0.30;
+        let sellerBonus = Math.min(rawSellerBonus, 15000); 
+        let firmGross = totalProfit - sellerBonus; 
+        
+        // Partner share is strictly 22.5% of the Firm's Final Gross Fee
+        let partnerTakeHome = firmGross * 0.225;
 
-        // If no final bid, UI shows full spread; otherwise shows 70% portion
         window.currentFirmFee = (finalBid > 0) ? Math.round(firmGross) : Math.round(totalProfit);
 
         suggestedClosing = (window.currentFirmFee > 15000) ? "Double Close" : "Assignment";
@@ -377,24 +379,24 @@
         let baseReloNum = parseFloat(reloValStr.replace(/\D/g, "")) || 0;
         let sellerNetBase = debtTotalVal + baseReloNum; 
         
-        // Determine spread based on actual bid or estimated floor
         const referencePrice = (finalBidVal > 0) ? finalBidVal : floorPrice;
         const totalSpread = (referencePrice > sellerNetBase) ? (referencePrice - sellerNetBase) : 0;
 
         let firmGrossFee, currentSellerBonus, calcPurchasePrice;
 
-        // SWITCH LOGIC: Packet A = Full Estimate | Addendum = 70/30 Profit Capture
         if (currentSyncMode === 'PACKET_A') {
             firmGrossFee = Math.round(totalSpread); 
             currentSellerBonus = 0; 
             calcPurchasePrice = sellerNetBase + 10000; 
         } else {
-            firmGrossFee = Math.round(totalSpread * 0.70);
-            currentSellerBonus = Math.round(totalSpread * 0.30);
+            let rawBonus = totalSpread * 0.30;
+            currentSellerBonus = Math.round(Math.min(rawBonus, 15000));
+            firmGrossFee = Math.round(totalSpread - currentSellerBonus);
             calcPurchasePrice = sellerNetBase + currentSellerBonus; 
         }
 
-        const partnerTakeHome = Math.round(totalSpread * 0.225);
+        // Final Partner share calculation for sync
+        const partnerTakeHome = Math.round(firmGrossFee * 0.225);
         const totalReloCombinedVal = baseReloNum + currentSellerBonus;
 
         const data = {
