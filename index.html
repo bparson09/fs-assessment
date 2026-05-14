@@ -44,6 +44,7 @@
         .summary-card { background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #edf2f7; }
         .summary-line { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; }
         .office-view { display: none; background: #fffbeb; padding: 12px; border-radius: 10px; margin-top: 15px; border: 1px dashed #f59e0b; }
+        .disclosure-notice { background: #fff7ed; border: 1px solid #fed7aa; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 0.7rem; color: #9a3412; display: none; }
     </style>
 </head>
 <body>
@@ -108,6 +109,13 @@
             </div>
         </div>
 
+        <!-- NEW: Disclosure Date Field -->
+        <div id="disclosure-section" class="field-box" style="display:none;">
+            <label class="field-label">14-Day Disclosure Signed Date</label>
+            <input type="date" id="disclosure-date" class="input-full">
+            <div class="disclosure-notice" id="disclosure-alert">Required for Green leads before Agreement print.</div>
+        </div>
+
         <span class="section-label">Financials</span>
         <div class="field-box"><label class="field-label">After Repair Value (ARV)</label><input type="text" id="arv" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)"></div>
         
@@ -152,6 +160,9 @@
             <div id="deal-verdict" style="text-align:center; font-weight:bold; margin-bottom:10px; font-size: 1.1rem;"></div>
             
             <div id="office-view" class="office-view">
+                <span class="field-label" id="label-closing-method" style="color:#b45309; font-weight: bold; text-transform: uppercase;">SUGGESTED CLOSING</span>
+                <div id="off-closing-method" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">-</div>
+
                 <span class="field-label" id="label-partner" style="color:#92400e; text-transform: uppercase;">EST PARTNER SHARE</span>
                 <div id="off-partner-display" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">$0</div>
 
@@ -188,6 +199,7 @@
     let floorGrossFee = 0; 
     let currentSyncMode = "";
     let floorPrice = 0;
+    let suggestedClosing = "Assignment";
     window.currentFirmFee = 0;
 
     function unlockMachine() {
@@ -212,10 +224,13 @@
             document.getElementById('results').style.display = "none";
             document.getElementById('auction-status').style.display = "none";
             document.getElementById('office-view').style.display = "none";
+            document.getElementById('disclosure-section').style.display = "none";
+            document.getElementById('disclosure-alert').style.display = "none";
             leadColor = "";
             baseDebtRelo = 0;
             floorGrossFee = 0;
             floorPrice = 0;
+            suggestedClosing = "Assignment";
             window.currentFirmFee = 0;
             window.scrollTo(0, 0);
             alert("Tool Reset. Ready for the next assessment.");
@@ -228,11 +243,24 @@
     function updateAuctionStatus() {
         const val = document.getElementById('auction-date').value;
         const banner = document.getElementById('auction-status');
+        const discSec = document.getElementById('disclosure-section');
         if(!val) return;
         const diff = Math.ceil((new Date(val) - new Date()) / (1000 * 60 * 60 * 24));
         banner.style.display = "block";
-        if(diff < 15) { leadColor = "RED"; banner.style.backgroundColor = "#fee2e2"; banner.style.color = "#b91c1c"; banner.innerText = "🔴 RED LEAD (Auction < 15 Days)"; } 
-        else { leadColor = "GREEN"; banner.style.backgroundColor = "#dcfce7"; banner.style.color = "#15803d"; banner.innerText = "🟢 GREEN LEAD (Safe Timeline)"; }
+        if(diff < 15) { 
+            leadColor = "RED"; 
+            banner.style.backgroundColor = "#fee2e2"; 
+            banner.style.color = "#b91c1c"; 
+            banner.innerText = "🔴 RED LEAD (Auction < 15 Days)"; 
+            discSec.style.display = "none";
+        } 
+        else { 
+            leadColor = "GREEN"; 
+            banner.style.backgroundColor = "#dcfce7"; 
+            banner.style.color = "#15803d"; 
+            banner.innerText = "🟢 GREEN LEAD (Safe Timeline)"; 
+            discSec.style.display = "block";
+        }
     }
 
     function triggerCam(counterId) { activeCounterId = counterId; document.getElementById('cam').click(); }
@@ -260,6 +288,10 @@
 
         window.currentFirmFee = Math.round(firmGross);
 
+        // UPGRADE: Suggested Closing Method
+        suggestedClosing = (window.currentFirmFee > 15000) ? "Double Close" : "Assignment";
+        document.getElementById('off-closing-method').innerText = suggestedClosing;
+
         if (finalBid > 0) {
             btn.style.display = "block";
         } else {
@@ -279,7 +311,6 @@
         baseDebtRelo = debt + reloBase;
         floorPrice = (arv * 0.70) - repairs; 
         
-        // UPGRADE: Verdict now checks TOTAL potential spread against the 9000 threshold
         let totalPotentialSpread = floorPrice - baseDebtRelo;
         
         document.getElementById('results').style.display = "block";
@@ -305,6 +336,15 @@
     }
 
     function prepareSync(mode) {
+        // UPGRADE: Green Lead Logic - check disclosure date
+        if (mode === 'PACKET_A' && leadColor === 'GREEN') {
+            const discDate = document.getElementById('disclosure-date').value;
+            if (!discDate) {
+                document.getElementById('disclosure-alert').style.display = 'block';
+                document.getElementById('disclosure-section').scrollIntoView({behavior: 'smooth'});
+                return alert("Green leads require the 14-Day Disclosure Date before printing.");
+            }
+        }
         currentSyncMode = mode;
         document.getElementById('signing-modal').style.display = 'flex';
     }
@@ -389,6 +429,8 @@
             partner_share: currentPartnerShare.toLocaleString(),
             seller_bonus: currentSellerBonus.toLocaleString(),
             lead_color: leadColor,
+            disclosure_date: document.getElementById('disclosure-date').value || "N/A",
+            closing_method: suggestedClosing,
             timestamp: today.toLocaleString()
         };
         
