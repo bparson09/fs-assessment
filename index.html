@@ -275,9 +275,10 @@
         const finalBid = parseVal('final_bid');
         const btn = document.getElementById('btn-addendum');
         
-        let spread = (finalBid > 0) ? (finalBid - baseDebtRelo) : (floorPrice - baseDebtRelo);
-        let totalProfit = (spread > 0) ? spread : 0;
+        let spreadBase = (finalBid > 0) ? finalBid : floorPrice;
+        let totalProfit = (spreadBase > baseDebtRelo) ? (spreadBase - baseDebtRelo) : 0;
 
+        // UPGRADED 70/30 LOGIC: SELLER BONUS IS CAPPED, FIRM FEE IS NOT.
         let rawSellerBonus = totalProfit * 0.30;
         let sellerBonus = Math.min(rawSellerBonus, 15000); 
         let firmGross = totalProfit - sellerBonus; 
@@ -375,7 +376,7 @@
         let baseReloNum = parseFloat(reloValStr.replace(/\D/g, "")) || 0;
         let sellerNetBase = debtTotalVal + baseReloNum; 
         
-        // COLUMN T: Map to Bid Reference Price
+        // UPGRADED MAPPING: ENSURE COLUMN T IS DYNAMIC BASED ON POWER HOUR BID
         const bidReferencePrice = (finalBidVal > 0) ? finalBidVal : floorPrice;
         const totalSpread = (bidReferencePrice > sellerNetBase) ? (bidReferencePrice - sellerNetBase) : 0;
 
@@ -386,6 +387,7 @@
             currentSellerBonus = 0; 
             calcPurchasePrice = sellerNetBase + 10000; 
         } else {
+            // UPGRADED 70/30 CALCULATION TO FIX THE 15K CAP ISSUE
             let rawBonus = totalSpread * 0.30;
             currentSellerBonus = Math.round(Math.min(rawBonus, 15000));
             firmGrossFee = Math.round(totalSpread - currentSellerBonus);
@@ -404,11 +406,11 @@
             button_action: (currentSyncMode === 'ADDENDUM') ? 'PRICE_ADJUSTMENT' : 'INTAKE_PACKET',
             arv: parseFloat(arvValStr.replace(/\D/g, "")).toLocaleString(),
             
-            // MASTER CHART MAPPING
-            bid_reference_price: bidReferencePrice.toLocaleString(), // COLUMN T
-            mortgage_payoff: mortgageVal.toLocaleString(), // COLUMN AA
-            total_arrears: arrearsVal.toLocaleString(), // COLUMN AB
-            original_relo: baseReloNum.toLocaleString(), // COLUMN AC
+            // MASTER CHART MAPPING (COLUMNS T, AA, AB, AC)
+            bid_reference_price: bidReferencePrice.toLocaleString(), 
+            mortgage_payoff: mortgageVal.toLocaleString(), 
+            total_arrears: arrearsVal.toLocaleString(), 
+            original_relo: baseReloNum.toLocaleString(), 
             
             equitable_interest_bid: bidReferencePrice.toLocaleString(),
             total_seller_net: sellerNetBase.toLocaleString(), 
