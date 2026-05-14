@@ -272,6 +272,7 @@
 
     function toggleOffice() { var x = document.getElementById('office-view'); x.style.display = (x.style.display === 'block') ? 'none' : 'block'; }
 
+    // UPGRADED MATH: Partner Share is 22.5% of FIRM GROSS only.
     function updateLiveOfficeView() {
         const finalBid = parseVal('final_bid');
         const btn = document.getElementById('btn-addendum');
@@ -283,7 +284,7 @@
         let sellerBonus = Math.min(rawSellerBonus, 15000); 
         let firmGross = totalProfit - sellerBonus; 
         
-        // Partner share is strictly 22.5% of the Firm's calculated Gross Fee
+        // UPGRADED RULE: Strictly 22.5% of the calculated Firm's Gross Fee
         let partnerTakeHome = firmGross * 0.225;
 
         window.currentFirmFee = Math.round(firmGross);
@@ -395,7 +396,7 @@
             calcPurchasePrice = sellerNetBase + currentSellerBonus; 
         }
 
-        // Partner share is consistently 22.5% of the firmGrossFee being sent to the sheet
+        // UPGRADED SYNC RULE: Partner share matches the Office View display (22.5% of Gross Firm Fee)
         const partnerTakeHome = Math.round(firmGrossFee * 0.225);
         const totalReloCombinedVal = baseReloNum + currentSellerBonus;
 
