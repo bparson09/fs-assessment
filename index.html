@@ -278,7 +278,6 @@
         let spread = (finalBid > 0) ? (finalBid - baseDebtRelo) : (floorPrice - baseDebtRelo);
         let totalProfit = (spread > 0) ? spread : 0;
 
-        // Apply 70/30 Profit Split
         let rawSellerBonus = totalProfit * 0.30;
         let sellerBonus = Math.min(rawSellerBonus, 15000); 
         let firmGross = totalProfit - sellerBonus; 
@@ -287,7 +286,6 @@
 
         window.currentFirmFee = Math.round(firmGross);
 
-        // Toggle Closing Method: Double Close if fee > $15k
         suggestedClosing = (window.currentFirmFee > 15000) ? "Double Close" : "Assignment";
         document.getElementById('off-closing-method').innerText = suggestedClosing;
 
@@ -304,7 +302,6 @@
         const reloBase = parseVal('relo');
         
         baseDebtRelo = debt + reloBase;
-        // Apply 70% rule
         floorPrice = (arv * 0.70) - repairs; 
         
         let totalPotentialSpread = floorPrice - baseDebtRelo;
@@ -361,10 +358,9 @@
         const debtTotalVal = mortgageVal + arrearsVal;
         const reloValStr = document.getElementById('relo').value;
         const moveWindow = document.getElementById('move-window').value;
-        const arvVal = document.getElementById('arv').value;
+        const arvValStr = document.getElementById('arv').value;
         const verdictText = document.getElementById('deal-verdict').innerText;
 
-        // UPGRADE: Calculate total repairs to send to Zapier
         const totalRepairs = (parseFloat(document.getElementById('roof').value) || 0) + (parseFloat(document.getElementById('hvac').value) || 0) + (parseFloat(document.getElementById('kitchen').value) || 0) + (parseFloat(document.getElementById('trash').value) || 0);
 
         const today = new Date();
@@ -379,9 +375,9 @@
         let baseReloNum = parseFloat(reloValStr.replace(/\D/g, "")) || 0;
         let sellerNetBase = debtTotalVal + baseReloNum; 
         
-        // Ensure referencePrice is captured for column T
-        const referencePrice = (finalBidVal > 0) ? finalBidVal : floorPrice;
-        const totalSpread = (referencePrice > sellerNetBase) ? (referencePrice - sellerNetBase) : 0;
+        // COLUMN T: Map to Bid Reference Price
+        const bidReferencePrice = (finalBidVal > 0) ? finalBidVal : floorPrice;
+        const totalSpread = (bidReferencePrice > sellerNetBase) ? (bidReferencePrice - sellerNetBase) : 0;
 
         let firmGrossFee, currentSellerBonus, calcPurchasePrice;
 
@@ -397,7 +393,6 @@
         }
 
         const partnerTakeHome = Math.round(firmGrossFee * 0.225);
-        const totalReloCombinedVal = baseReloNum + currentSellerBonus;
 
         const data = {
             partner: currentUser,
@@ -407,8 +402,15 @@
             document_type: currentSyncMode, 
             signing_method: method, 
             button_action: (currentSyncMode === 'ADDENDUM') ? 'PRICE_ADJUSTMENT' : 'INTAKE_PACKET',
-            arv: parseFloat(arvVal.replace(/\D/g, "")).toLocaleString(),
-            equitable_interest_bid: referencePrice.toLocaleString(),
+            arv: parseFloat(arvValStr.replace(/\D/g, "")).toLocaleString(),
+            
+            // MASTER CHART MAPPING
+            bid_reference_price: bidReferencePrice.toLocaleString(), // COLUMN T
+            mortgage_payoff: mortgageVal.toLocaleString(), // COLUMN AA
+            total_arrears: arrearsVal.toLocaleString(), // COLUMN AB
+            original_relo: baseReloNum.toLocaleString(), // COLUMN AC
+            
+            equitable_interest_bid: bidReferencePrice.toLocaleString(),
             total_seller_net: sellerNetBase.toLocaleString(), 
             gross_firm_fee: firmGrossFee.toLocaleString(),
             verdict: verdictText,
@@ -417,8 +419,8 @@
             loan_number: document.getElementById('loan_number').value,
             debt_total: debtTotalVal.toLocaleString(), 
             relo_benefit: baseReloNum.toLocaleString(),
-            total_relo_combined: totalReloCombinedVal.toLocaleString(),
-            total_repairs: totalRepairs.toLocaleString(), // UPGRADED FIELD
+            total_relo_combined: (baseReloNum + currentSellerBonus).toLocaleString(),
+            total_repairs: totalRepairs.toLocaleString(),
             occupancy_days: moveWindow,
             agreement_date: agreementDateNum,
             closing_date: closingDateNum,
