@@ -100,7 +100,7 @@
                 <input type="date" id="auction-date" class="input-full" onchange="updateAuctionStatus()">
             </div>
             <div class="field-box">
-                <label class="field-label">Move Window</label>
+                <label class="field-label">Move Window (Inc. FAQ Logic)</label>
                 <select id="move-window" class="input-full">
                     <option value="3">3 Days</option>
                     <option value="5" selected>5 Days</option>
@@ -123,7 +123,7 @@
             <div class="field-box"><label class="field-label">Total Arrears</label><input type="text" id="arrears" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)"></div>
         </div>
         
-        <div class="field-box"><label class="field-label">Relo Benefit</label><input type="text" id="relo" class="input-full currency" value="2,000" oninput="formatCurrency(this)"></div>
+        <div class="field-box"><label class="field-label">Relo Benefit (Moving Expense Rule)</label><input type="text" id="relo" class="input-full currency" value="2,000" oninput="formatCurrency(this)"></div>
 
         <span class="section-label">Property Condition</span>
         <div class="input-group"><select id="roof"><option value="0">Roof: Functional ($0)</option><option value="8000">Roof: Repair ($8k)</option><option value="15000">Roof: Replacement ($15k)</option></select><button class="camera-btn" onclick="triggerCam('count-roof')">📸<span id="count-roof" class="photo-count">0</span></button></div>
@@ -165,11 +165,11 @@
                 <span class="field-label" id="label-partner" style="color:#92400e; text-transform: uppercase;">EST PARTNER SHARE (22.5%)</span>
                 <div id="off-partner-display" style="font-size:1.1rem; font-weight:bold; color:#1e293b; margin-bottom:10px;">$0</div>
 
-                <span class="field-label" id="label-bonus" style="color:#92400e; text-transform: uppercase;">LIVE SELLER BONUS (30%)</span>
+                <span class="field-label" id="label-bonus" style="color:#92400e; text-transform: uppercase;">LIVE SELLER BONUS (30% SPLIT)</span>
                 <div id="off-bonus-display" style="font-size:1.1rem; font-weight:bold; color:var(--safe-green); margin-bottom:10px;">$0</div>
 
                 <div class="field-box">
-                    <label class="field-label" style="color:#92400e; font-weight: bold;">Power Hour Final Bid ($)</label>
+                    <label class="field-label" style="color:#92400e; font-weight: bold;">Equitable Interest / Power Hour Bid ($)</label>
                     <input type="text" id="final_bid" class="input-full currency" placeholder="Enter Final Bid..." oninput="formatCurrency(this); updateLiveOfficeView();">
                 </div>
 
@@ -230,7 +230,6 @@
             suggestedClosing = "Assignment";
             window.currentFirmFee = 0;
             window.scrollTo(0, 0);
-            alert("Tool Reset. Ready for the next assessment.");
         }
     }
 
@@ -272,7 +271,6 @@
 
     function toggleOffice() { var x = document.getElementById('office-view'); x.style.display = (x.style.display === 'block') ? 'none' : 'block'; }
 
-    // UPDATED MATH: Locked Partner Share to 22.5% of the calculated Firm's Gross Fee
     function updateLiveOfficeView() {
         const finalBid = parseVal('final_bid');
         const btn = document.getElementById('btn-addendum');
@@ -282,10 +280,9 @@
 
         // Apply 70/30 Profit Split
         let rawSellerBonus = totalProfit * 0.30;
-        let sellerBonus = Math.min(rawSellerBonus, 15000); // Capped at $15k
+        let sellerBonus = Math.min(rawSellerBonus, 15000); 
         let firmGross = totalProfit - sellerBonus; 
         
-        // UPGRADED RULE: Partner Share is 22.5% of Gross Firm Fee
         let partnerTakeHome = firmGross * 0.225;
 
         window.currentFirmFee = Math.round(firmGross);
@@ -294,11 +291,7 @@
         suggestedClosing = (window.currentFirmFee > 15000) ? "Double Close" : "Assignment";
         document.getElementById('off-closing-method').innerText = suggestedClosing;
 
-        if (finalBid > 0) {
-            btn.style.display = "block";
-        } else {
-            btn.style.display = "none";
-        }
+        if (finalBid > 0) { btn.style.display = "block"; } else { btn.style.display = "none"; }
 
         document.getElementById('off-partner-display').innerText = "$" + Math.round(partnerTakeHome).toLocaleString();
         document.getElementById('off-bonus-display').innerText = "$" + Math.round(sellerBonus).toLocaleString();
@@ -344,7 +337,6 @@
             if (!discDate) {
                 document.getElementById('disclosure-alert').style.display = 'block';
                 document.getElementById('disclosure-section').scrollIntoView({behavior: 'smooth'});
-                // Mandatory disclosure check for Green leads
                 return alert("Green leads require the 14-Day Disclosure Date before printing.");
             }
         }
@@ -400,7 +392,6 @@
             calcPurchasePrice = sellerNetBase + currentSellerBonus; 
         }
 
-        // UPGRADED SYNC RULE: Partner share matches the Office View display (22.5% of Gross Firm Fee)
         const partnerTakeHome = Math.round(firmGrossFee * 0.225);
         const totalReloCombinedVal = baseReloNum + currentSellerBonus;
 
@@ -413,7 +404,7 @@
             signing_method: method, 
             button_action: (currentSyncMode === 'ADDENDUM') ? 'PRICE_ADJUSTMENT' : 'INTAKE_PACKET',
             arv: parseFloat(arvVal.replace(/\D/g, "")).toLocaleString(),
-            bid_reference_price: referencePrice.toLocaleString(),
+            equitable_interest_bid: referencePrice.toLocaleString(),
             total_seller_net: sellerNetBase.toLocaleString(), 
             gross_firm_fee: firmGrossFee.toLocaleString(),
             verdict: verdictText,
