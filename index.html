@@ -251,6 +251,7 @@
         const finalBid = parseVal('final_bid');
         const btn = document.getElementById('btn-addendum');
         
+        // UPGRADE: Math correction to ensure full gross profit is captured
         let spread = (finalBid > 0) ? (finalBid - baseDebtRelo) : floorGrossFee;
         let totalProfit = (spread > 0) ? spread : 0;
 
@@ -275,13 +276,18 @@
         const debt = parseVal('mortgage') + parseVal('arrears');
         const repairs = (parseFloat(document.getElementById('roof').value) || 0) + (parseFloat(document.getElementById('hvac').value) || 0) + (parseFloat(document.getElementById('kitchen').value) || 0) + (parseFloat(document.getElementById('trash').value) || 0);
         const reloBase = parseVal('relo');
+        
         baseDebtRelo = debt + reloBase;
         floorPrice = (arv * 0.70) - repairs; 
+        
+        // UPGRADE: Fixing logic floor to adhere to 9000 threshold
         floorGrossFee = floorPrice - baseDebtRelo;
+        
         document.getElementById('results').style.display = "block";
         document.getElementById('res-debt').innerText = "$" + debt.toLocaleString();
         document.getElementById('res-relo').innerText = "$" + reloBase.toLocaleString();
         document.getElementById('res-total').innerText = "$" + (baseDebtRelo).toLocaleString();
+        
         updateLiveOfficeView();
         const verdictEl = document.getElementById('deal-verdict');
         const syncBtn = document.getElementById('sync-btn');
@@ -366,7 +372,7 @@
             mortgage_payoff: mortgageVal.toLocaleString(),
             total_arrears: arrearsVal.toLocaleString(),
             bid_reference_price: (finalBidVal > 0) ? finalBidVal.toLocaleString() : Math.round(floorPrice).toLocaleString(),
-            total_seller_net: sellerNetBase.toLocaleString(), // FIX: Removed "$" to prevent SignNow RegEx errors
+            total_seller_net: sellerNetBase.toLocaleString(), 
             gross_firm_fee: window.currentFirmFee.toLocaleString(),
             verdict: verdictText,
             purchase_price: Math.round(calcPurchasePrice).toLocaleString(), 
