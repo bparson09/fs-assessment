@@ -283,10 +283,10 @@
         let sellerBonus = Math.min(rawSellerBonus, 15000); 
         let firmGross = totalProfit - sellerBonus; 
         
-        // Partner share is strictly 22.5% of the Firm's Final Gross Fee
+        // Partner share is strictly 22.5% of the Firm's calculated Gross Fee
         let partnerTakeHome = firmGross * 0.225;
 
-        window.currentFirmFee = (finalBid > 0) ? Math.round(firmGross) : Math.round(totalProfit);
+        window.currentFirmFee = Math.round(firmGross);
 
         suggestedClosing = (window.currentFirmFee > 15000) ? "Double Close" : "Assignment";
         document.getElementById('off-closing-method').innerText = suggestedClosing;
@@ -395,7 +395,7 @@
             calcPurchasePrice = sellerNetBase + currentSellerBonus; 
         }
 
-        // Final Partner share calculation for sync
+        // Partner share is consistently 22.5% of the firmGrossFee being sent to the sheet
         const partnerTakeHome = Math.round(firmGrossFee * 0.225);
         const totalReloCombinedVal = baseReloNum + currentSellerBonus;
 
