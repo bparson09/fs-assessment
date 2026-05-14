@@ -109,7 +109,6 @@
             </div>
         </div>
 
-        <!-- NEW: Disclosure Date Field -->
         <div id="disclosure-section" class="field-box" style="display:none;">
             <label class="field-label">14-Day Disclosure Signed Date</label>
             <input type="date" id="disclosure-date" class="input-full">
@@ -196,7 +195,6 @@
     let leadColor = ""; 
     let currentUser = "";
     let baseDebtRelo = 0; 
-    let floorGrossFee = 0; 
     let currentSyncMode = "";
     let floorPrice = 0;
     let suggestedClosing = "Assignment";
@@ -228,7 +226,6 @@
             document.getElementById('disclosure-alert').style.display = "none";
             leadColor = "";
             baseDebtRelo = 0;
-            floorGrossFee = 0;
             floorPrice = 0;
             suggestedClosing = "Assignment";
             window.currentFirmFee = 0;
@@ -286,9 +283,9 @@
         let sellerBonus = totalProfit * 0.30;
         let partnerTakeHome = totalProfit * 0.225;
 
-        window.currentFirmFee = Math.round(firmGross);
+        // If no final bid, UI shows full spread; otherwise shows 70% portion
+        window.currentFirmFee = (finalBid > 0) ? Math.round(firmGross) : Math.round(totalProfit);
 
-        // UPGRADE: Suggested Closing Method
         suggestedClosing = (window.currentFirmFee > 15000) ? "Double Close" : "Assignment";
         document.getElementById('off-closing-method').innerText = suggestedClosing;
 
@@ -336,7 +333,6 @@
     }
 
     function prepareSync(mode) {
-        // UPGRADE: Green Lead Logic - check disclosure date
         if (mode === 'PACKET_A' && leadColor === 'GREEN') {
             const discDate = document.getElementById('disclosure-date').value;
             if (!discDate) {
@@ -368,7 +364,6 @@
         const moveWindow = document.getElementById('move-window').value;
         const arvVal = document.getElementById('arv').value;
         const verdictText = document.getElementById('deal-verdict').innerText;
-        const repairsTotal = (parseFloat(document.getElementById('roof').value) || 0) + (parseFloat(document.getElementById('hvac').value) || 0) + (parseFloat(document.getElementById('kitchen').value) || 0) + (parseFloat(document.getElementById('trash').value) || 0);
 
         const today = new Date();
         const agreementDateNum = formatNumericDate(today);
@@ -379,25 +374,28 @@
         powerHourObj.setDate(closingObj.getDate() - 8);
         const powerHourNum = formatNumericDate(powerHourObj);
 
-        let calcPurchasePrice = 0;
-        let currentSellerBonus = 0;
-        let currentPartnerShare = 0;
         let baseReloNum = parseFloat(reloValStr.replace(/\D/g, "")) || 0;
         let sellerNetBase = debtTotalVal + baseReloNum; 
         
-        let spread = (finalBidVal > 0) ? (finalBidVal - sellerNetBase) : (floorPrice - sellerNetBase);
-        let totalProfit = (spread > 0) ? spread : 0;
-        
-        currentSellerBonus = Math.round(totalProfit * 0.30);
-        currentPartnerShare = Math.round(totalProfit * 0.225);
+        // Determine spread based on actual bid or estimated floor
+        const referencePrice = (finalBidVal > 0) ? finalBidVal : floorPrice;
+        const totalSpread = (referencePrice > sellerNetBase) ? (referencePrice - sellerNetBase) : 0;
 
-        if (finalBidVal > 0) {
-            calcPurchasePrice = sellerNetBase + currentSellerBonus;
+        let firmGrossFee, currentSellerBonus, calcPurchasePrice;
+
+        // SWITCH LOGIC: Packet A = Full Estimate | Addendum = 70/30 Profit Capture
+        if (currentSyncMode === 'PACKET_A') {
+            firmGrossFee = Math.round(totalSpread); 
+            currentSellerBonus = 0; 
+            calcPurchasePrice = sellerNetBase + 10000; 
         } else {
-            calcPurchasePrice = sellerNetBase + 10000;
+            firmGrossFee = Math.round(totalSpread * 0.70);
+            currentSellerBonus = Math.round(totalSpread * 0.30);
+            calcPurchasePrice = sellerNetBase + currentSellerBonus; 
         }
 
-        let totalReloCombinedVal = baseReloNum + currentSellerBonus;
+        const partnerTakeHome = Math.round(totalSpread * 0.225);
+        const totalReloCombinedVal = baseReloNum + currentSellerBonus;
 
         const data = {
             partner: currentUser,
@@ -408,11 +406,9 @@
             signing_method: method, 
             button_action: (currentSyncMode === 'ADDENDUM') ? 'PRICE_ADJUSTMENT' : 'INTAKE_PACKET',
             arv: parseFloat(arvVal.replace(/\D/g, "")).toLocaleString(),
-            mortgage_payoff: mortgageVal.toLocaleString(),
-            total_arrears: arrearsVal.toLocaleString(),
-            bid_reference_price: (finalBidVal > 0) ? finalBidVal.toLocaleString() : Math.round(floorPrice).toLocaleString(),
+            bid_reference_price: referencePrice.toLocaleString(),
             total_seller_net: sellerNetBase.toLocaleString(), 
-            gross_firm_fee: window.currentFirmFee.toLocaleString(),
+            gross_firm_fee: firmGrossFee.toLocaleString(),
             verdict: verdictText,
             purchase_price: Math.round(calcPurchasePrice).toLocaleString(), 
             lender_name: document.getElementById('lender_name').value,
@@ -420,17 +416,16 @@
             debt_total: debtTotalVal.toLocaleString(), 
             relo_benefit: baseReloNum.toLocaleString(),
             total_relo_combined: totalReloCombinedVal.toLocaleString(),
-            total_repairs: repairsTotal.toLocaleString(),
             occupancy_days: moveWindow,
             agreement_date: agreementDateNum,
             closing_date: closingDateNum,
             power_hour_date: powerHourNum,
             auction_actual: document.getElementById('auction-date').value,
-            partner_share: currentPartnerShare.toLocaleString(),
+            partner_share: partnerTakeHome.toLocaleString(),
             seller_bonus: currentSellerBonus.toLocaleString(),
             lead_color: leadColor,
             disclosure_date: document.getElementById('disclosure-date').value || "N/A",
-            closing_method: suggestedClosing,
+            closing_method: (firmGrossFee > 15000) ? "Double Close" : "Assignment",
             timestamp: today.toLocaleString()
         };
         
