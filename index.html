@@ -26,6 +26,7 @@
         .content { padding: 12px; }
         .section-label { font-size: 0.7rem; font-weight: bold; color: var(--main-teal); text-transform: uppercase; margin: 18px 0 10px 0; display: block; border-bottom: 1px solid #eee; padding-bottom: 4px; }
         .field-box { margin-bottom: 12px; }
+        .field-box { margin-bottom: 12px; }
         .field-label { font-size: 0.75rem; font-weight: bold; color: #4a5568; margin-bottom: 4px; display: block; }
         .input-full { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
         .financial-grid { display: flex; flex-direction: column; gap: 10px; }
@@ -310,7 +311,12 @@
         document.getElementById('results').style.display = "block";
         document.getElementById('res-debt').innerText = "$" + debt.toLocaleString();
         document.getElementById('res-relo').innerText = "$" + reloBase.toLocaleString();
-        document.getElementById('res-total').innerText = "$" + (baseDebtRelo).toLocaleString();
+
+        // UPGRADED LIVE VISUAL SHEET TOTAL REFLECTS TRUE DYNAMIC ALLOCATION
+        let rawBonus = totalPotentialSpread > 0 ? totalPotentialSpread * 0.30 : 0;
+        let liveSellerBonus = Math.min(rawBonus, 15000);
+        let dynamicSellerTotal = baseDebtRelo + liveSellerBonus;
+        document.getElementById('res-total').innerText = "$" + Math.round(dynamicSellerTotal).toLocaleString();
         
         updateLiveOfficeView();
         const verdictEl = document.getElementById('deal-verdict');
@@ -376,23 +382,16 @@
         let baseReloNum = parseFloat(reloValStr.replace(/\D/g, "")) || 0;
         let sellerNetBase = debtTotalVal + baseReloNum; 
         
-        // UPGRADED MAPPING: ENSURE COLUMN T IS DYNAMIC BASED ON POWER HOUR BID
         const bidReferencePrice = (finalBidVal > 0) ? finalBidVal : floorPrice;
         const totalSpread = (bidReferencePrice > sellerNetBase) ? (bidReferencePrice - sellerNetBase) : 0;
 
         let firmGrossFee, currentSellerBonus, calcPurchasePrice;
 
-        if (currentSyncMode === 'PACKET_A') {
-            firmGrossFee = Math.round(totalSpread); 
-            currentSellerBonus = 0; 
-            calcPurchasePrice = sellerNetBase + 10000; 
-        } else {
-            // UPGRADED 70/30 CALCULATION TO FIX THE 15K CAP ISSUE
-            let rawBonus = totalSpread * 0.30;
-            currentSellerBonus = Math.round(Math.min(rawBonus, 15000));
-            firmGrossFee = Math.round(totalSpread - currentSellerBonus);
-            calcPurchasePrice = sellerNetBase + currentSellerBonus; 
-        }
+        // FIXED: BOTH PACKET A AND ADDENDUM RUN THE UNIFIED 70/30 CAPACITY SCALE FOR BULLETPROOF MAPPING CONVENIENCE
+        let rawBonus = totalSpread * 0.30;
+        currentSellerBonus = Math.round(Math.min(rawBonus, 15000));
+        firmGrossFee = Math.round(totalSpread - currentSellerBonus);
+        calcPurchasePrice = sellerNetBase + currentSellerBonus;
 
         const partnerTakeHome = Math.round(firmGrossFee * 0.225);
 
