@@ -90,6 +90,16 @@
         </div>
 
         <div class="field-box">
+            <label class="field-label">Lead Type</label>
+            <select id="lead_type" class="input-full">
+                <option value="Pre-Foreclosure">Pre-Foreclosure</option>
+                <option value="Tax Lien">Tax Lien</option>
+                <option value="Probate">Probate</option>
+                <option value="Tired Landlord">Tired Landlord</option>
+            </select>
+        </div>
+
+        <div class="field-box">
             <label class="field-label">Property Address</label>
             <input type="text" id="address" class="input-full" placeholder="Street, City, State">
         </div>
@@ -398,6 +408,7 @@
             partner: currentUser,
             seller_name: document.getElementById('seller_name').value,
             seller_email: document.getElementById('seller_email').value,
+            lead_type: document.getElementById('lead_type').value,
             address: document.getElementById('address').value,
             document_type: currentSyncMode, 
             signing_method: method, 
