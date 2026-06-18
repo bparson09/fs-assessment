@@ -84,6 +84,11 @@
             <input type="text" id="seller_name" class="input-full" placeholder="John & Jane Doe">
         </div>
 
+        <div class="field-box" id="deceased_section" style="display:none;">
+            <label class="field-label">Deceased Individual Name</label>
+            <input type="text" id="deceased_name" class="input-full" placeholder="e.g. Gertrude Jordan">
+        </div>
+
         <div class="field-box">
             <label class="field-label">Seller Email (For Disclosures)</label>
             <input type="email" id="seller_email" class="input-full" placeholder="name@example.com">
@@ -91,7 +96,7 @@
 
         <div class="field-box">
             <label class="field-label">Lead Type</label>
-            <select id="lead_type" class="input-full">
+            <select id="lead_type" class="input-full" onchange="toggleDeceasedField()">
                 <option value="Pre-Foreclosure">Pre-Foreclosure</option>
                 <option value="Tax Lien">Tax Lien</option>
                 <option value="Probate">Probate</option>
@@ -190,7 +195,7 @@
                 <div class="summary-line"><span>Total Debt Cleared:</span> <span id="res-debt">$0</span></div>
                 <div class="summary-line"><span>Relocation Benefit:</span> <span id="res-relo">$0</span></div>
                 <div class="summary-line" style="border-top:1px solid #ccc; padding-top:10px; font-weight:bold; color:var(--main-teal); font-size:1rem;">
-                    <span>GUARANTEED SELLER TOTAL:</span> <span id="res-total">$0</span>
+                    <span>GUARANTEED SELLER TOTAL:</span> <span id="res-total">$0
                 </div>
             </div>
             <button id="sync-btn" class="btn-action-master" style="background:var(--action-red);" onclick="prepareSync('PACKET_A')">GENERATE PACKET A</button>
@@ -218,6 +223,17 @@
         document.getElementById('toggle-office-btn').style.display = 'block';
     }
 
+    function toggleDeceasedField() {
+        const leadType = document.getElementById('lead_type').value;
+        const deceasedSec = document.getElementById('deceased_section');
+        if (leadType === 'Probate') {
+            deceasedSec.style.display = 'block';
+        } else {
+            deceasedSec.style.display = 'none';
+            document.getElementById('deceased_name').value = "";
+        }
+    }
+
     function refreshTool() {
         if(confirm("Are you sure you want to clear all data and reset?")) {
             const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="date"]');
@@ -234,6 +250,7 @@
             document.getElementById('office-view').style.display = "none";
             document.getElementById('disclosure-section').style.display = "none";
             document.getElementById('disclosure-alert').style.display = "none";
+            document.getElementById('deceased_section').style.display = "none";
             leadColor = "";
             baseDebtRelo = 0;
             floorPrice = 0;
@@ -407,6 +424,7 @@
         const data = {
             partner: currentUser,
             seller_name: document.getElementById('seller_name').value,
+            deceased_name: document.getElementById('deceased_name').value,
             seller_email: document.getElementById('seller_email').value,
             lead_type: document.getElementById('lead_type').value,
             address: document.getElementById('address').value,
