@@ -195,7 +195,7 @@
                 <div class="summary-line"><span>Total Debt Cleared:</span> <span id="res-debt">$0</span></div>
                 <div class="summary-line"><span>Relocation Benefit:</span> <span id="res-relo">$0</span></div>
                 <div class="summary-line" style="border-top:1px solid #ccc; padding-top:10px; font-weight:bold; color:var(--main-teal); font-size:1rem;">
-                    <span>GUARANTEED SELLER TOTAL:</span> <span id="res-total">$0
+                    <span>GUARANTEED SELLER TOTAL:</span> <span id="res-total">$0</span>
                 </div>
             </div>
             <button id="sync-btn" class="btn-action-master" style="background:var(--action-red);" onclick="prepareSync('PACKET_A')">GENERATE PACKET A</button>
@@ -405,6 +405,16 @@
         powerHourObj.setDate(closingObj.getDate() - 8);
         const powerHourNum = formatNumericDate(powerHourObj);
 
+        // DYNAMIC OCCUPANCY TIMELINE CALCULATIONS FOR CATCH HOOK
+        const moveDaysInt = parseInt(moveWindow) || 5;
+        const vacateObj = new Date(closingObj);
+        vacateObj.setDate(closingObj.getDate() + moveDaysInt);
+        const targetVacateNum = formatNumericDate(vacateObj);
+
+        const moverObj = new Date(vacateObj);
+        moverObj.setDate(vacateObj.getDate() - 3);
+        const moverTriggerNum = formatNumericDate(moverObj);
+
         let baseReloNum = parseFloat(reloValStr.replace(/\D/g, "")) || 0;
         let sellerNetBase = debtTotalVal + baseReloNum; 
         
@@ -454,6 +464,8 @@
             agreement_date: agreementDateNum,
             closing_date: closingDateNum,
             power_hour_date: powerHourNum,
+            target_vacate_date: targetVacateNum,
+            mover_trigger: moverTriggerNum,
             auction_actual: document.getElementById('auction-date').value,
             partner_share: partnerTakeHome.toLocaleString(),
             seller_bonus: currentSellerBonus.toLocaleString(),
