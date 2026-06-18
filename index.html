@@ -104,6 +104,14 @@
             </select>
         </div>
 
+        <div class="field-box" id="interview_target_container" style="display:none;">
+            <label class="field-label">Interview Target</label>
+            <select id="interview_target" class="input-full" onchange="toggleInterviewLayout()">
+                <option value="Landlord">Landlord (The Leverage/Financial Call)</option>
+                <option value="Tenant">Tenant (On-Site Intake)</option>
+            </select>
+        </div>
+
         <div class="field-box">
             <label class="field-label">Property Address</label>
             <input type="text" id="address" class="input-full" placeholder="Street, City, State">
@@ -130,15 +138,60 @@
             <div class="disclosure-notice" id="disclosure-alert">Required for Green leads before Agreement print.</div>
         </div>
 
-        <span class="section-label">Financials</span>
-        <div class="field-box"><label class="field-label">After Repair Value (ARV)</label><input type="text" id="arv" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)"></div>
-        
-        <div class="financial-grid">
-            <div class="field-box"><label class="field-label">Mortgage Payoff</label><input type="text" id="mortgage" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)"></div>
-            <div class="field-box"><label class="field-label">Total Arrears</label><input type="text" id="arrears" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)"></div>
+        <div id="financials_section">
+            <span class="section-label">Financials</span>
+            <div class="field-box"><label class="field-label">After Repair Value (ARV)</label><input type="text" id="arv" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)"></div>
+            
+            <div class="financial-grid">
+                <div class="field-box"><label class="field-label">Mortgage Payoff</label><input type="text" id="mortgage" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)"></div>
+                <div class="field-box"><label class="field-label">Total Arrears</label><input type="text" id="arrears" class="input-full currency" placeholder="$0.00" oninput="formatCurrency(this)"></div>
+            </div>
+            
+            <div class="field-box"><label class="field-label">Relo Benefit (Moving Expense Rule)</label><input type="text" id="relo" class="input-full currency" value="2,000" oninput="formatCurrency(this)"></div>
         </div>
-        
-        <div class="field-box"><label class="field-label">Relo Benefit (Moving Expense Rule)</label><input type="text" id="relo" class="input-full currency" value="2,000" oninput="formatCurrency(this)"></div>
+
+        <div id="tenant_section" style="display:none; margin-top: 20px; border-top: 2px dashed var(--main-teal); padding-top: 15px;">
+            <span class="section-label" style="color: var(--main-teal); border-bottom: none; margin-top: 0;">Tenant Cooperative Onboarding</span>
+            
+            <div class="field-box">
+                <label class="field-label">How long have you lived in this home?</label>
+                <input type="text" id="tenant_tenure" class="input-full" placeholder="e.g. 3 years">
+            </div>
+            
+            <div class="field-box">
+                <label class="field-label">Do you already have a new place lined up, or are you actively looking?</label>
+                <select id="tenant_housing_status" class="input-full">
+                    <option value="needs_help">Has no place lined up / Needs immediate assistance</option>
+                    <option value="searching">Actively looking / Just needs moving cash</option>
+                    <option value="ready">Has a place / Ready to transition</option>
+                </select>
+            </div>
+            
+            <div class="field-box">
+                <label class="field-label">What is your biggest concern or obstacle when it comes to moving out?</label>
+                <input type="text" id="tenant_concern" class="input-full" placeholder="e.g. Upfront security deposit, finding a truck...">
+            </div>
+            
+            <div class="field-box">
+                <label class="field-label">Are there any pets, kids, or specialty items we need to tell the moving company about?</label>
+                <input type="text" id="tenant_logistics" class="input-full" placeholder="e.g. 2 dogs, large piano, heavy appliances...">
+            </div>
+
+            <div class="financial-grid">
+                <div class="field-box">
+                    <label class="field-label">Relocation Cash Benefit ($)</label>
+                    <input type="text" id="tenant_relo_benefit" class="input-full currency" value="2,000" oninput="formatCurrency(this)">
+                </div>
+                <div class="field-box">
+                    <label class="field-label">Move Window</label>
+                    <select id="tenant_move_window" class="input-full">
+                        <option value="7">7 Days</option>
+                        <option value="14">14 Days</option>
+                        <option value="30">30 Days</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
         <span class="section-label">Property Condition</span>
         <div class="input-group"><select id="roof"><option value="0">Roof: Functional ($0)</option><option value="8000">Roof: Repair ($8k)</option><option value="15000">Roof: Replacement ($15k)</option></select><button class="camera-btn" onclick="triggerCam('count-roof')">📸<span id="count-roof" class="photo-count">0</span></button></div>
@@ -226,11 +279,36 @@
     function toggleDeceasedField() {
         const leadType = document.getElementById('lead_type').value;
         const deceasedSec = document.getElementById('deceased_section');
+        const interviewTargetContainer = document.getElementById('interview_target_container');
+        
         if (leadType === 'Probate') {
             deceasedSec.style.display = 'block';
         } else {
             deceasedSec.style.display = 'none';
             document.getElementById('deceased_name').value = "";
+        }
+
+        if (leadType === 'Tired Landlord') {
+            interviewTargetContainer.style.display = 'block';
+        } else {
+            interviewTargetContainer.style.display = 'none';
+            document.getElementById('interview_target').selectedIndex = 0;
+        }
+        toggleInterviewLayout();
+    }
+
+    function toggleInterviewLayout() {
+        const leadType = document.getElementById('lead_type').value;
+        const interviewTarget = document.getElementById('interview_target').value;
+        const financialsSection = document.getElementById('financials_section');
+        const tenantSection = document.getElementById('tenant_section');
+
+        if (leadType === 'Tired Landlord' && interviewTarget === 'Tenant') {
+            financialsSection.style.display = 'none';
+            tenantSection.style.display = 'block';
+        } else {
+            financialsSection.style.display = 'block';
+            tenantSection.style.display = 'none';
         }
     }
 
@@ -239,6 +317,7 @@
             const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="date"]');
             inputs.forEach(input => input.value = "");
             document.getElementById('relo').value = "2,000";
+            document.getElementById('tenant_relo_benefit').value = "2,000";
             const selects = document.querySelectorAll('select');
             selects.forEach(select => {
                 if (select.id !== "user_identity") select.selectedIndex = 0;
@@ -251,6 +330,9 @@
             document.getElementById('disclosure-section').style.display = "none";
             document.getElementById('disclosure-alert').style.display = "none";
             document.getElementById('deceased_section').style.display = "none";
+            document.getElementById('interview_target_container').style.display = "none";
+            document.getElementById('financials_section').style.display = "block";
+            document.getElementById('tenant_section').style.display = "none";
             leadColor = "";
             baseDebtRelo = 0;
             floorPrice = 0;
@@ -324,6 +406,25 @@
     }
 
     function runAssessment() {
+        const leadType = document.getElementById('lead_type').value;
+        const interviewTarget = document.getElementById('interview_target').value;
+        
+        if (leadType === 'Tired Landlord' && interviewTarget === 'Tenant') {
+            document.getElementById('results').style.display = "block";
+            document.getElementById('res-debt').innerText = "$0 (Tenant Intake Mode)";
+            const tenantRelo = parseVal('tenant_relo_benefit');
+            document.getElementById('res-relo').innerText = "$" + tenantRelo.toLocaleString();
+            document.getElementById('res-total').innerText = "$" + tenantRelo.toLocaleString();
+            
+            const verdictEl = document.getElementById('deal-verdict');
+            const syncBtn = document.getElementById('sync-btn');
+            verdictEl.innerText = "TENANT COOPERATIVE MODE";
+            verdictEl.style.color = "var(--main-teal)";
+            syncBtn.innerText = "GENERATE TENANT ADDENDUM";
+            syncBtn.style.backgroundColor = "var(--main-teal)";
+            return;
+        }
+
         const arv = parseVal('arv');
         const debt = parseVal('mortgage') + parseVal('arrears');
         const repairs = (parseFloat(document.getElementById('roof').value) || 0) + (parseFloat(document.getElementById('hvac').value) || 0) + (parseFloat(document.getElementById('kitchen').value) || 0) + (parseFloat(document.getElementById('trash').value) || 0);
@@ -385,6 +486,54 @@
 
     async function executeSync(method) {
         closeModal();
+        const leadType = document.getElementById('lead_type').value;
+        const interviewTarget = document.getElementById('interview_target').value;
+
+        if (leadType === 'Tired Landlord' && interviewTarget === 'Tenant') {
+            const tenantReloVal = parseVal('tenant_relo_benefit');
+            const tenantMoveWindow = document.getElementById('tenant_move_window').value;
+            const today = new Date();
+            const agreementDateNum = formatNumericDate(today);
+            const moveDaysInt = parseInt(tenantMoveWindow) || 7;
+            const vacateObj = new Date();
+            vacateObj.setDate(today.getDate() + moveDaysInt);
+            const targetVacateNum = formatNumericDate(vacateObj);
+            
+            const moverObj = new Date(vacateObj);
+            moverObj.setDate(vacateObj.getDate() - 3);
+            const moverTriggerNum = formatNumericDate(moverObj);
+
+            const tenantData = {
+                partner: currentUser,
+                seller_name: document.getElementById('seller_name').value,
+                seller_email: document.getElementById('seller_email').value,
+                lead_type: leadType,
+                interview_target: interviewTarget,
+                address: document.getElementById('address').value,
+                document_type: 'TENANT_ADDENDUM',
+                signing_method: method,
+                button_action: 'INTAKE_PACKET',
+                agreement_date: agreementDateNum,
+                target_vacate_date: targetVacateNum,
+                mover_trigger: moverTriggerNum,
+                occupancy_days: tenantMoveWindow,
+                relo_benefit: tenantReloVal.toLocaleString(),
+                total_relo_combined: tenantReloVal.toLocaleString(),
+                tenant_tenure: document.getElementById('tenant_tenure').value,
+                tenant_housing_status: document.getElementById('tenant_housing_status').value,
+                tenant_concern: document.getElementById('tenant_concern').value,
+                tenant_logistics: document.getElementById('tenant_logistics').value,
+                timestamp: today.toLocaleString()
+            };
+
+            try {
+                await fetch('https://hooks.zapier.com/hooks/catch/27133148/ujl6lys/', { method: 'POST', mode: 'no-cors', body: JSON.stringify(tenantData) });
+                alert("✅ Tenant Addendum Synced via " + method);
+                refreshTool();
+            } catch (e) { alert("⚠️ Sync failed."); }
+            return;
+        }
+
         const finalBidVal = parseVal('final_bid');
         const mortgageVal = parseVal('mortgage');
         const arrearsVal = parseVal('arrears');
@@ -437,6 +586,7 @@
             deceased_name: document.getElementById('deceased_name').value,
             seller_email: document.getElementById('seller_email').value,
             lead_type: document.getElementById('lead_type').value,
+            interview_target: interviewTarget || "N/A",
             address: document.getElementById('address').value,
             document_type: currentSyncMode, 
             signing_method: method, 
